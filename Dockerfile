@@ -1,5 +1,5 @@
 # Builder is ubuntu-based because we need i386 libs
-FROM steamcmd/steamcmd:ubuntu-22 as builder
+FROM steamcmd/steamcmd:ubuntu-22 AS builder
 
 # Install prerequisites to download steamcmd
 RUN apt-get update \
@@ -11,7 +11,7 @@ WORKDIR /root/installer
 RUN curl -sqL --insecure https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zxvf -
 
 #FROM alpine:latest
-FROM ubuntu:latest
+FROM ubuntu:24.04
 
 
 # The TMOD Version. Ensure that you follow the correct format. Version releases can be found at https://github.com/tModLoader/tModLoader/releases if you're lost.
@@ -55,7 +55,7 @@ ENV TMOD_WORLDSEED="Docker"
 # difficulty
 ENV TMOD_DIFFICULTY="1"
 # secure
-ENV TMOD_SECURE="0"
+ENV TMOD_SECURE="1"
 # language
 ENV TMOD_LANGUAGE="en-US"
 # npcstream
@@ -116,7 +116,7 @@ COPY --from=builder /root/installer/linux32/libstdc++.so.6 /lib/
 RUN chown -R root:root /usr/bin/ /etc/ssl/certs /lib/ /usr/lib/
 
 RUN apt-get update \
-    && apt-get install -y wget unzip tmux bash libsdl2-2.0-0
+    && apt-get install -y wget unzip tmux bash libsdl2-2.0-0 netcat-traditional
 
 RUN mkdir /data
 RUN mkdir /data/tModLoader
