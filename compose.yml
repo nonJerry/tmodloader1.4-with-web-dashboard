@@ -3,12 +3,14 @@ services:
     container_name: 'terraria'
     build: .
     image: terraria:local
+    restart: unless-stopped
     healthcheck:
       test: "nc -z 127.0.0.1 7777 || exit 1"
       interval: 30s
       timeout: 5s
-      start_period: 120s
+      start_period: 180s
       retries: 3
+      x-podman.on_failure: restart
     ports:
       - '127.0.0.1:7778:7777'
     volumes:
