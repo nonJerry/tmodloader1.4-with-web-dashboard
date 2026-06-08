@@ -16,4 +16,4 @@ services:
     volumes:
       - /srv/terraria:/data:z
     env_file:
-      - /opt/terraria/terraria.env
+      - terraria.env
