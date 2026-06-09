@@ -21,3 +21,16 @@ services:
     env_file:
       - .env
     entrypoint: ["/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6000 -h /www"]
+  web:
+    container_name: 'web'
+    build: ./control/frontend
+    image: terraria/web-server:local
+    restart: unless-stopped
+    healthcheck:
+      test: "wget --quiet --tries=1 --spider http://127.0.0.1:8080 || exit 1"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    ports:
+      - 6001:8080

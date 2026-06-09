@@ -17,4 +17,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    proxy: {
+      '/cgi-bin': {
+        target: 'http://terraria:6000',
+        changeOrigin: true,
+      }
+    }
+  }
 })
