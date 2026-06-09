@@ -1,3 +1,5 @@
 temp
 *.env
 *.bak
+
+node_modules
