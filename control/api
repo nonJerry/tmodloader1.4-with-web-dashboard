@@ -1,0 +1,71 @@
+#!/bin/sh
+
+echo "Content-Type: text/plain"
+echo
+
+case "$REQUEST_METHOD" in
+    GET)
+        case "$PATH_INFO" in
+            /status)
+                tmux send-keys "playing" Enter
+
+                sleep 1
+
+                tmux capture-pane -p \
+                    | tail -n 3 \
+                    | awk '/connected/{print $1}'
+                ;;
+            *)
+                echo "Unknown GET endpoint"
+                ;;
+        esac
+        ;;
+
+    POST)
+        case "$PATH_INFO" in
+            /stop)
+                tmux send-keys "exit" Enter
+                kill $(pgrep -f autosave.sh)
+                echo "OK"
+                ;;
+
+            /start)
+                pgrep -f terraria-server >/dev/null || /terraria-server/entrypoint.sh &
+                echo "OK"
+                ;;
+
+            /midnight)
+                tmux send-keys "midnight" Enter
+                echo "OK"
+                ;;
+
+            /dawn)
+                tmux send-keys "dawn" Enter
+                echo "OK"
+                ;;
+
+            /noon)
+                tmux send-keys "noon" Enter
+                echo "OK"
+                ;;
+
+            /dusk)
+                tmux send-keys "dusk" Enter
+                echo "OK"
+                ;;
+
+            /save)
+                tmux send-keys "save" Enter
+                echo "OK"
+                ;;
+
+            *)
+                echo "Unknown POST endpoint"
+                ;;
+        esac
+        ;;
+
+    *)
+        echo "Method Not Allowed"
+        ;;
+esac
