@@ -19,7 +19,7 @@ test.describe('Terraria Server Control page', () => {
   const playerCounts = ['0', '1', '10', '100']
 
   for (const playerCount of playerCounts) {
-    test(`displays ${playerCount} players online`, async ({ page, browserName }) => {
+    test(`displays ${playerCount} players online`, async ({ page }) => {
       await page.route('**/cgi-bin/api/status', (route) => {
         route.fulfill({
           status: 200,
@@ -35,7 +35,7 @@ test.describe('Terraria Server Control page', () => {
   }
 
 
-  test('updates when player count changes', async ({ page, browserName }) => {
+  test('updates when player count changes', async ({ page }) => {
     let call = 0
     await page.route('**/cgi-bin/api/status', (route) => {
       call++

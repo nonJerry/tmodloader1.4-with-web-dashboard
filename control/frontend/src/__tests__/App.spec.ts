@@ -47,7 +47,7 @@ describe('App', () => {
   )
 
   it('updates when player count changes', async () => {
-    const fetchMock = vi.fn()
+    const fetchMock = vi.fn<() => Promise<{ ok: boolean; text: () => Promise<string> }>>()
       .mockResolvedValueOnce({ ok: true, text: async () => '1' })
       .mockResolvedValueOnce({ ok: true, text: async () => '4' })
 
