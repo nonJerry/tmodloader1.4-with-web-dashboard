@@ -24,14 +24,22 @@ describe('App', () => {
   it('renders title', async () => {
     const wrapper = await mountWithPlayers('1')
 
-    expect(wrapper.text()).toContain('Terraria Server Control')
+    expect(wrapper.find('h1').text()).toContain('Terraria Server Control')
+  })
+
+  it('shows that server is stopped', async () => {
+    const wrapper = await mountWithPlayers('STOPPED')
+
+    expect(wrapper.find('.player-count').text()).toContain('STOPPED')
+    expect(wrapper.find('.status-card').text()).toContain('STOPPED')
+
   })
 
   it.each(['0', '1', '10', '100'])(
     'shows %s players online',
     async (players) => {
       const wrapper = await mountWithPlayers(players)
-      expect(wrapper.text()).toContain(players)
+      expect(wrapper.find('.player-count').text()).toContain(players)
     },
   )
 
@@ -43,11 +51,11 @@ describe('App', () => {
     const wrapper = mount(App)
 
     await flushPromises()
-    expect(wrapper.text()).toContain('1')
+    expect(wrapper.find('.player-count').text()).toContain('1')
 
     await (wrapper.vm as any).fetchStatus()
     await flushPromises()
-    expect(wrapper.text()).toContain('4')
+    expect(wrapper.find('.player-count').text()).toContain('4')
   })
 })
 
@@ -58,7 +66,7 @@ describe('Buttons', () => {
     const commands = ['start', 'stop', 'save', 'dawn', 'noon', 'dusk', 'midnight']
 
     commands.forEach((cmd) => {
-      expect(wrapper.text()).toContain(cmd)
+      expect(wrapper.find('.button-grid').text()).toContain(cmd)
     })
   })
 
