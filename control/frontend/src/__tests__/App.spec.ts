@@ -1,41 +1,30 @@
 import { describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import App from '../App.vue'
 
 async function mountWithPlayers(players: string) {
   vi.stubGlobal(
     'fetch',
-    vi.fn(() =>
-      Promise.resolve({
+    vi.fn(() => {
+      return Promise.resolve({
         ok: true,
         text: () => Promise.resolve(players),
-      }),
+      })
+    },
     ),
   )
   const wrapper = mount(App)
 
-  await wrapper.vm.$nextTick()
-  await new Promise((resolve) => setTimeout(resolve, 0))
-
+  await flushPromises()
   return wrapper
 }
 
 describe('App', () => {
 
-  it('renders title', () => {
-    const wrapper = mount(App)
+  it('renders title', async () => {
+    const wrapper = await mountWithPlayers('1')
 
     expect(wrapper.text()).toContain('Terraria Server Control')
-  })
-
-  it('renders command buttons', () => {
-    const wrapper = mount(App)
-
-    const commands = ['start', 'stop', 'save', 'dawn', 'noon', 'dusk', 'midnight']
-
-    commands.forEach((cmd) => {
-      expect(wrapper.text()).toContain(cmd)
-    })
   })
 
   it.each(['0', '1', '10', '100'])(
@@ -50,19 +39,55 @@ describe('App', () => {
     const fetchMock = vi.fn<() => Promise<{ ok: boolean; text: () => Promise<string> }>>()
       .mockResolvedValueOnce({ ok: true, text: async () => '1' })
       .mockResolvedValueOnce({ ok: true, text: async () => '4' })
-
     vi.stubGlobal('fetch', fetchMock)
-
     const wrapper = mount(App)
 
-    await wrapper.vm.$nextTick()
-    await new Promise((r) => setTimeout(r, 0))
+    await flushPromises()
     expect(wrapper.text()).toContain('1')
 
-    // need to wait for next value
     await (wrapper.vm as any).fetchStatus()
-    await wrapper.vm.$nextTick()
-    await new Promise((r) => setTimeout(r, 0))
+    await flushPromises()
     expect(wrapper.text()).toContain('4')
+  })
+})
+
+describe('Buttons', () => {
+
+  it('are all displayed', async () => {
+    const wrapper = await mountWithPlayers('1')
+    const commands = ['start', 'stop', 'save', 'dawn', 'noon', 'dusk', 'midnight']
+
+    commands.forEach((cmd) => {
+      expect(wrapper.text()).toContain(cmd)
+    })
+  })
+
+
+  it('are disabled except start when server is stopped', async () => {
+    const wrapper = await mountWithPlayers('STOPPED')
+    const buttons = wrapper.findAll('button')
+
+    buttons.forEach((btn) => {
+      const label = btn.text()
+      if (label === 'start') {
+        expect(btn.element.disabled).toBe(false)
+      } else {
+        expect(btn.element.disabled).toBe(true)
+      }
+    })
+  })
+
+  it('are disabled immediately on click until next status update', async () => {
+    const wrapper = await mountWithPlayers('1')
+
+    const anyBtn = wrapper.find('button')
+    let buttons = wrapper.findAll('button')
+    buttons.forEach(btn => expect(btn.element.disabled).toBe(false))
+
+    await anyBtn.trigger('click')
+    wrapper.findAll('button').forEach(btn => expect(btn.element.disabled).toBe(true))
+
+    await (wrapper.vm as any).fetchStatus()
+    wrapper.findAll('button').forEach(btn => expect(btn.element.disabled).toBe(false))
   })
 })

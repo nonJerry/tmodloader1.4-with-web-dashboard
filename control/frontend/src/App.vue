@@ -11,7 +11,7 @@
 
     <section class="button-grid">
       <button v-for="command in commands" :key="command" @click="sendCommand(command)"
-        :disabled="(players === 'STOPPED' && command !== 'start')">
+        :disabled="buttonsDisabled || (players === 'STOPPED' && command !== 'start')">
         {{ command }}
       </button>
     </section>
@@ -55,15 +55,18 @@ async function fetchStatus(): Promise<void> {
     if (text.trim() === 'STOPPED') {
       players.value = 'STOPPED'
     } else {
-    players.value = Number(text) || 0
+      players.value = Number(text) || 0
     }
   } catch (error) {
     console.error(error)
     players.value = 0
+  } finally {
+    buttonsDisabled.value = false // buttons only disabled if server is stopped
   }
 }
 
 async function sendCommand(command: string): Promise<void> {
+  buttonsDisabled.value = true
   try {
     const response = await fetch(`${BASE_PATH}/${command}`, {
       method: 'POST',
@@ -78,11 +81,10 @@ async function sendCommand(command: string): Promise<void> {
     setTimeout(() => {
       message.value = ''
     }, 3000)
-
-    await fetchStatus()
   } catch (error) {
     console.error(error)
     message.value = `Failed to send ${command}`
+    buttonsDisabled.value = false // avoid having to reload on error
   }
 }
 

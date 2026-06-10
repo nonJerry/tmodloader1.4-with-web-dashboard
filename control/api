@@ -6,7 +6,6 @@ echo
 if [ ! "$(pgrep -f tmux)" ]; then
     if [ "$PATH_INFO" != "/start" ]; then
         echo "STOPPED"
-        echo "OK"
         exit 0
     fi
 fi
@@ -32,6 +31,8 @@ case "$REQUEST_METHOD" in
     POST)
         case "$PATH_INFO" in
             /stop)
+                say $TMOD_SHUTDOWN_MESSAGE
+                sleep 3
                 tmux send-keys "exit" Enter
                 kill $(pgrep -f autosave.sh)
                 echo "OK"
