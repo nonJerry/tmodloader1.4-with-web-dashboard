@@ -1,0 +1,54 @@
+services:
+  terraria:
+    container_name: 'terraria'
+    build: ..
+    image: terraria:local
+    restart: unless-stopped
+    healthcheck:
+      test: "nc -z 127.0.0.1 6000 || exit 1"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+      x-podman.on_failure: restart
+    ports:
+      - '6002:6002'
+    expose:
+      - 6002
+    volumes:
+      - server_data:/data
+      - ../control/api:/www/cgi-bin/api
+    env_file:
+      - .env
+    entrypoint: ["/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6002 -h /www"]
+
+  api:
+    container_name: 'api'
+    build:
+      args:
+      - NODE_ENV=development
+      context: ../control/backend
+      target: development
+    command: npm run start-watch
+    image: node:alpine
+    ports:
+      - '8000:8000'
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+    secrets:
+      - users
+    volumes:
+      - ../control/backend/src:/code/src:ro
+      - ../control/backend/package.json:/code/package.json
+      - ../control/backend/package-lock.json:/code/package-lock.json
+      - back-notused:/opt/app/node_modules
+    depends_on:
+      - terraria
+
+secrets:
+  users:
+    file: ../example.users.json
+
+volumes:
+  back-notused:
+  server_data:
