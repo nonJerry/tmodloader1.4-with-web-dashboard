@@ -3,10 +3,18 @@
 echo "Content-Type: text/plain"
 echo
 
+if [ ! "$(pgrep -f tmux)" ]; then
+    if [ "$PATH_INFO" != "/start" ]; then
+        echo "STOPPED"
+        echo "OK"
+        exit 0
+    fi
+fi
+
 case "$REQUEST_METHOD" in
     GET)
         case "$PATH_INFO" in
-            /status)
+            /status)         
                 tmux send-keys "playing" Enter
 
                 sleep 1

@@ -10,7 +10,8 @@
     </section>
 
     <section class="button-grid">
-      <button v-for="command in commands" :key="command" @click="sendCommand(command)">
+      <button v-for="command in commands" :key="command" @click="sendCommand(command)"
+        :disabled="(players === 'STOPPED' && command !== 'start')">
         {{ command }}
       </button>
     </section>
@@ -27,8 +28,9 @@ import { onMounted, onUnmounted, ref } from 'vue'
 
 const BASE_PATH = '/cgi-bin/api'
 
-const players = ref<number>(0)
+const players = ref<number | string>(0)
 const message = ref<string>('')
+const buttonsDisabled = ref<boolean>(false)
 
 const commands = [
   'start',
@@ -49,7 +51,12 @@ async function fetchStatus(): Promise<void> {
     }
 
     const text = await response.text()
+
+    if (text.trim() === 'STOPPED') {
+      players.value = 'STOPPED'
+    } else {
     players.value = Number(text) || 0
+    }
   } catch (error) {
     console.error(error)
     players.value = 0
