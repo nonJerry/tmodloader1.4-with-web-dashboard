@@ -3,7 +3,7 @@
     <h1>Terraria Server Control</h1>
 
     <section class="status-card">
-      <h2>Players Online</h2>
+      <h2 v-if="players!='STOPPED'">Players Online</h2>
       <div class="player-count">
         {{ players }}
       </div>
