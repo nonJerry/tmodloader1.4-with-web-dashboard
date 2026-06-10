@@ -3,7 +3,7 @@
     <h1>Terraria Server Control</h1>
 
     <section class="status-card">
-      <h2 v-if="players!='STOPPED'">Players Online</h2>
+      <h2 v-if="players != 'STOPPED'">Players Online</h2>
       <div class="player-count">
         {{ players }}
       </div>
@@ -26,9 +26,9 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 
 
-const BASE_PATH = '/cgi-bin/api'
+const BASE_PATH = '/api'
 
-const players = ref<number | string>(0)
+const players = ref<string>('0')
 const message = ref<string>('')
 const buttonsDisabled = ref<boolean>(false)
 
@@ -51,15 +51,11 @@ async function fetchStatus(): Promise<void> {
     }
 
     const text = await response.text()
+    players.value = text.trim()
 
-    if (text.trim() === 'STOPPED') {
-      players.value = 'STOPPED'
-    } else {
-      players.value = Number(text) || 0
-    }
   } catch (error) {
     console.error(error)
-    players.value = 0
+    players.value = '0'
   } finally {
     buttonsDisabled.value = false // buttons only disabled if server is stopped
   }

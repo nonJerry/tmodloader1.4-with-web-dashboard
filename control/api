@@ -1,7 +1,6 @@
 #!/bin/sh
 
-echo "Content-Type: text/plain"
-echo
+printf "Content-Type: text/plain\r\n\r\n"
 
 if [ ! "$(pgrep -f tmux)" ]; then
     if [ "$PATH_INFO" != "/start" ]; then

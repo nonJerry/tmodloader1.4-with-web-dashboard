@@ -1,15 +1,13 @@
 <template>
 	<form @submit.prevent="loginFn" class="wrapped-form">
-		<label for="secret">Secret Secret</label>
-		<input
-			id="secret"
-			name="secret"
-			v-model.trim="credentials.secret"
-			type="password"
-			required />
+		<label for="id">What may go here?</label>
+		<input id="id" name="userid" v-model.trim="credentials.id" type="text" required />
+
+		<label for="password">The second riddle?</label>
+		<input id="password" name="passwd" v-model.trim="credentials.password" type="password" required />
 
 		<div class="to-end">
-			<button type="submit">Login</button>
+			<button type="submit">Mystery Function</button>
 		</div>
 	</form>
 </template>
@@ -29,8 +27,8 @@ const credentials = reactive({
 const loginFn = async () => {
 	try {
 		await auth.login(credentials)
-	} catch (error) { 
-		console.log(error.message) 
+	} catch (error) {
+		console.log(error.message)
 	}
 	await router.push('/')
 }

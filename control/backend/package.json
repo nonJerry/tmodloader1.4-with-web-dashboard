@@ -1,0 +1,32 @@
+{
+    "name": "terraria-control-backend",
+    "version": "0.1",
+    "type": "module",
+    "main": "index.ts",
+    "scripts": {
+        "start": "ts-node src/index.ts",
+        "start-watch": "nodemon src/index.ts --inspect=0.0.0.0:9229",
+        "start-wait-debuger": "nodemon src/index.ts --inspect-brk=0.0.0.0:9229",
+        "test": "cross-env NODE_ENV=test PORT=8081 mocha --timeout 10000 --exit --inspect=0.0.0.0:9230",
+        "test-watch": "nodemon --exec \"npm test\"",
+        "test-wait-debuger": "cross-env NODE_ENV=test PORT=8081 mocha --no-timeouts --exit --inspect-brk=0.0.0.0:9230"
+    },
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "express": "^5.2.1",
+        "helmet": "^8.2.0",
+        "jsonwebtoken": "^9.0.3",
+        "undici": "^8.4.1"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^6.0.0",
+        "@types/express": "^5.0.6",
+        "@types/jsonwebtoken": "^9.0.10",
+        "nodemon": "^3.1.14",
+        "ts-node": "^10.9.2",
+        "typescript": "^6.0.3"
+    },
+    "allowScripts": {
+        "bcrypt@6.0.0": true
+    }
+}
