@@ -1,5 +1,5 @@
 # Builder is ubuntu-based because we need i386 libs
-FROM steamcmd/steamcmd:ubuntu-22 AS builder
+FROM steamcmd/steamcmd:ubuntu-24 AS builder
 
 # Install prerequisites to download steamcmd
 RUN apt-get update && \
@@ -9,9 +9,8 @@ WORKDIR /root/installer
 
 # Download and unpack installer
 # Insecure was added, apparently some Steam CDN certificate expired.
-RUN curl -sqL --insecure https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zxvf -
+RUN curl -sqL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar zxvf -
 
-#FROM alpine:latest
 FROM ubuntu:24.04
 
 # The TMOD Version. Ensure that you follow the correct format. Version releases can be found at https://github.com/tModLoader/tModLoader/releases if you're lost.
@@ -115,7 +114,7 @@ COPY --from=builder /root/installer/linux32/libstdc++.so.6 /lib/
 
 RUN chown -R root:root /usr/bin/ /etc/ssl/certs /lib/ /usr/lib/ && \
     apt-get update && \
-    apt-get install -y wget unzip tmux bash libsdl2-2.0-0 netcat-traditional busybox && \
+    apt-get install -y curl unzip tmux bash libsdl2-2.0-0 netcat-traditional busybox && \
     mkdir /data && \
     mkdir /data/tModLoader && \
     mkdir /data/tModLoader/Worlds && \
@@ -127,7 +126,7 @@ EXPOSE 7777
 WORKDIR /terraria-server
 
 RUN steamcmd /terraria-server +login anonymous +quit && \
-    wget https://github.com/tModLoader/tModLoader/releases/download/${TMOD_VERSION}/tModLoader.zip && \
+    curl -L -o tModLoader.zip "https://github.com/tModLoader/tModLoader/releases/download/${TMOD_VERSION}/tModLoader.zip" && \
     unzip -o tModLoader.zip && \
     rm tModLoader.zip
 
