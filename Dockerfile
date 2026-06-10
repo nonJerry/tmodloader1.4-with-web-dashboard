@@ -2,8 +2,9 @@
 FROM steamcmd/steamcmd:ubuntu-22 AS builder
 
 # Install prerequisites to download steamcmd
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl tar
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl tar
+
 WORKDIR /root/installer
 
 # Download and unpack installer
@@ -12,7 +13,6 @@ RUN curl -sqL --insecure https://steamcdn-a.akamaihd.net/client/installer/steamc
 
 #FROM alpine:latest
 FROM ubuntu:24.04
-
 
 # The TMOD Version. Ensure that you follow the correct format. Version releases can be found at https://github.com/tModLoader/tModLoader/releases if you're lost.
 ARG TMOD_VERSION=v2026.04.3.0
@@ -41,7 +41,7 @@ ENV TMOD_USECONFIGFILE="No"
 # The following environment variables will configure common settings for the tModLoader server.
 
 # motd
-ENV TMOD_MOTD="A tModLoader server powered by Docker!"
+ENV TMOD_MOTD="A tModLoader server powered by Podman!"
 # password
 ENV TMOD_PASS="docker"
 # maxplayers
@@ -105,7 +105,6 @@ ENV TMOD_JOURNEY_SPAWN_RATE="0"
 # Set this to "Yes" if you would rather use a config file instead of the above settings.
 # ENV TMOD_USECONFIGFILE="No"
 
-
 # Copy steamcmd and its required libs from the builder
 COPY --from=builder /root/installer/steamcmd.sh /usr/lib/games/steam/
 COPY --from=builder /root/installer/linux32/steamcmd /usr/lib/games/steam/
@@ -113,26 +112,24 @@ COPY --from=builder /usr/games/steamcmd /usr/bin/steamcmd
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder /lib/i386-linux-gnu /lib/
 COPY --from=builder /root/installer/linux32/libstdc++.so.6 /lib/
-RUN chown -R root:root /usr/bin/ /etc/ssl/certs /lib/ /usr/lib/
 
-RUN apt-get update \
-    && apt-get install -y wget unzip tmux bash libsdl2-2.0-0 netcat-traditional busybox
-
-RUN mkdir /data
-RUN mkdir /data/tModLoader
-RUN mkdir /data/tModLoader/Worlds
-RUN mkdir /data/tModLoader/Mods
-RUN mkdir /data/steamMods
+RUN chown -R root:root /usr/bin/ /etc/ssl/certs /lib/ /usr/lib/ && \
+    apt-get update && \
+    apt-get install -y wget unzip tmux bash libsdl2-2.0-0 netcat-traditional busybox && \
+    mkdir /data && \
+    mkdir /data/tModLoader && \
+    mkdir /data/tModLoader/Worlds && \
+    mkdir /data/tModLoader/Mods && \
+    mkdir /data/steamMods
 
 EXPOSE 7777
 
 WORKDIR /terraria-server
 
-RUN steamcmd /terraria-server +login anonymous +quit
-
-RUN wget https://github.com/tModLoader/tModLoader/releases/download/${TMOD_VERSION}/tModLoader.zip
-RUN unzip -o tModLoader.zip \
-    && rm tModLoader.zip
+RUN steamcmd /terraria-server +login anonymous +quit && \
+    wget https://github.com/tModLoader/tModLoader/releases/download/${TMOD_VERSION}/tModLoader.zip && \
+    unzip -o tModLoader.zip && \
+    rm tModLoader.zip
 
 COPY DotNetInstall.sh ./LaunchUtils
 COPY entrypoint.sh .
@@ -140,15 +137,13 @@ COPY inject.sh /usr/local/bin/inject
 COPY autosave.sh .
 COPY prepare-config.sh .
 
-RUN chmod 755 ./LaunchUtils/DotNetInstall.sh \
-    && chmod 755 ./LaunchUtils/ScriptCaller.sh \
-    && chmod 755 ./entrypoint.sh \
-    && chmod 755 ./autosave.sh \
-    && chmod 755 /usr/local/bin/inject \
-    && chmod 755 ./prepare-config.sh \
-    && chmod 755 ./start-tModLoaderServer.sh
-
-RUN ./LaunchUtils/DotNetInstall.sh
-
+RUN chmod 755 ./LaunchUtils/DotNetInstall.sh && \
+    chmod 755 ./LaunchUtils/ScriptCaller.sh && \
+    chmod 755 ./entrypoint.sh && \
+    chmod 755 ./autosave.sh && \
+    chmod 755 /usr/local/bin/inject && \
+    chmod 755 ./prepare-config.sh && \
+    chmod 755 ./start-tModLoaderServer.sh && \
+    ./LaunchUtils/DotNetInstall.sh
 
 ENTRYPOINT ["./entrypoint.sh"]

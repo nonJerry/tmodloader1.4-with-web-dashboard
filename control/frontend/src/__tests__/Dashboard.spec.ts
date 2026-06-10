@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import App from '../App.vue'
+import Dashboard from '@/views/Dashboard.vue'
 
 async function mountWithPlayers(players: string) {
   vi.stubGlobal(
@@ -13,13 +13,13 @@ async function mountWithPlayers(players: string) {
     },
     ),
   )
-  const wrapper = mount(App)
+  const wrapper = mount(Dashboard)
 
   await flushPromises()
   return wrapper
 }
 
-describe('App', () => {
+describe('Dashboard', () => {
 
   it('renders title', async () => {
     const wrapper = await mountWithPlayers('1')
@@ -48,7 +48,7 @@ describe('App', () => {
       .mockResolvedValueOnce({ ok: true, text: async () => '1' })
       .mockResolvedValueOnce({ ok: true, text: async () => '4' })
     vi.stubGlobal('fetch', fetchMock)
-    const wrapper = mount(App)
+    const wrapper = mount(Dashboard)
 
     await flushPromises()
     expect(wrapper.find('.player-count').text()).toContain('1')

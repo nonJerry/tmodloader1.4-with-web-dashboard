@@ -17,7 +17,9 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "axios": "^1.17.0",
     "pinia": "^3.0.4",
+    "sass": "^1.100.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   },
@@ -42,7 +44,7 @@
     "npm-run-all2": "^8.0.4",
     "oxlint": "~1.60.0",
     "prettier": "3.8.3",
-    "typescript": "~6.0.0",
+    "typescript": "^6.0.3",
     "vite": "^8.0.8",
     "vite-plugin-vue-devtools": "^8.1.1",
     "vitest": "^4.1.4",

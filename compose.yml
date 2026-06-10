@@ -21,6 +21,7 @@ services:
     env_file:
       - .env
     entrypoint: ["/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6000 -h /www"]
+
   web:
     container_name: 'web'
     build: ./control/frontend
@@ -34,3 +35,32 @@ services:
       retries: 3
     ports:
       - 6001:8080
+
+  laravel9_database:
+    image: mysql:8
+    volumes:
+      - database_api:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: mysqladmin -u${DB_USERNAME} -p${DB_PASSWORD} ping -h 127.0.0.1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+
+  laravel:
+    build: ./control/laravel
+    image: laravel9_api:from_scratch
+    volumes:
+      - ./.env:/var/www/laravel-app/.env
+    depends_on:
+      laravel9_database:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+
+
+volumes:
+  database_api:
