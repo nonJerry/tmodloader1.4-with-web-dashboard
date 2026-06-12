@@ -44,7 +44,6 @@ services:
       - ../control/backend/src:/code/src:ro
       - ../control/backend/package.json:/code/package.json
       - ../control/backend/package-lock.json:/code/package-lock.json
-      - back-notused:/opt/app/node_modules
     depends_on:
       - terraria
 

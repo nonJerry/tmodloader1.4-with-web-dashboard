@@ -21,8 +21,8 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const credentials = reactive({
-	username: null,
-	password: null
+	username: '',
+	password: ''
 })
 
 const loginFn = async () => {
