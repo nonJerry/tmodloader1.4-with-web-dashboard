@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { IS_PRODUCTION } from "../../config/constants.js"
 import bcrypt from 'bcrypt'
 import users from '../../services/users.service.js'
-import { createAccessToken, createToken, verifyToken } from '../../services/jwt.service.js'
+import { createAccessToken, createToken } from '../../services/jwt.service.js'
 
 export const handleLogin = () => {
     return async (req: Request, res: Response) => {
@@ -57,7 +57,7 @@ export const handleLogout = () => {
         }
 
         removeCookie("accessToken");
-        removeCookie("x-xsrf-token");
+        removeCookie("xsrf-token");
 
         req.session.destroy((err) => {
             if (err) {
@@ -69,32 +69,5 @@ export const handleLogout = () => {
             res.json({ success: true, message: "Logged out successfully" })
         })
 
-    }
-}
-
-export const getCurrentUser = () => {
-    return async (req: Request, res: Response) => {
-        console.log("Fetching current user...");
-        const token = req.cookies?.accessToken;
-
-        console.log(token);
-        if (!token) {
-            return res.status(401).json({ username: 'guest' });
-        }
-
-        try {
-            const payload = verifyToken(token);
-            const id = payload.username;
-
-            if (!users[id]) {
-                return res.status(401).json({ username: 'guest' });
-            }
-
-            return res.json({
-                username: id,
-            });
-        } catch (ignoredError) {
-            return res.status(401).json({ username: 'guest' });
-        }
     }
 }

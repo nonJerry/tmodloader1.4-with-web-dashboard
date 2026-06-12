@@ -7,7 +7,8 @@ import middlewareCSRF from './middlewareCSRF.js'
  * @param {string} endpoint either 'web' or 'api' (default)
  * @returns {AxiosInstance}
  */
-export const useApi = (endpoint = 'api') => {
+
+const useEndpoint = (endpoint = 'api') => {
 	const { API_HOST, API_PATH } = import.meta.env
 
 	let baseURL
@@ -17,16 +18,21 @@ export const useApi = (endpoint = 'api') => {
 	} else if (endpoint === 'web') {
 		baseURL = API_HOST || 'http://localhost:8000'
 	}
-
 	const axiosInstance = axios.create({
 		baseURL,
 		headers: { 'X-Requested-With': 'XMLHttpRequest' },
 		withCredentials: true,
 	})
+	return axiosInstance
+}
+export const useApi = (endpoint = 'api') => {
 
-	axiosInstance.interceptors.request.use( middlewareCSRF, err => Promise.reject(err))
-	
+	const axiosInstance = useEndpoint(endpoint)
+	axiosInstance.interceptors.request.use(middlewareCSRF, err => Promise.reject(err))
+
 	axiosInstance.interceptors.response.use(resp => resp, middleware401)
 
 	return axiosInstance
 }
+
+export const getCsrfToken = () => useEndpoint('web').get('/csrf-token')

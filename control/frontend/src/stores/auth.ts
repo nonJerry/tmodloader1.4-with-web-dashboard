@@ -2,29 +2,45 @@ import { defineStore } from 'pinia'
 // import router from '@/router'
 import { type Router } from 'vue-router'
 import { useUserStore } from '@/stores/user.js'
-import { useApi } from '@/api/useAPI'
+import { getCsrfToken, useApi } from '@/api/useAPI'
 const web = useApi('web')
 
 
 export interface AuthState {
-    username: string
-    isLoggedIn: boolean
+    isLoggedIn: boolean,
+    csrfToken: string;
 }
 
 
 export const useAuthStore = defineStore('auth', {
-    state: () => {
-        const stored = localStorage.getItem('AUTH_STATE')
-
-        return stored
-            ? JSON.parse(stored)
-            : {
-                username: 'guest',
-                isLoggedIn: false,
-            }
-    },
+    state: () => ({
+        isLoggedIn: false,
+        csrfToken: '',
+    }),
 
     actions: {
+        async initAuth() {
+            await useApi('api').get('/me').then(() => {
+                console.log('User is logged in')
+                this.updateState({ isLoggedIn: true })
+            }).catch(() => {
+                // Not logged in
+            })
+        },
+
+        async initializeCsrfToken() {
+            try {
+                const res = await getCsrfToken();
+                if ("csrfToken" in res.data) {
+                    this.updateState({ csrfToken: res.data.csrfToken })
+                } else {
+                    console.error('Failed to initialize CSRF token');
+                }
+            } catch (ignoredError) {
+                console.error('Failed to initialize CSRF token');
+            }
+        },
+
         updateState(payload: Partial<AuthState>) {
             this.$patch(payload)
 
@@ -37,13 +53,13 @@ export const useAuthStore = defineStore('auth', {
             const user = useUserStore()
             try {
                 await web.post('/login', { username, password })
-                this.updateState({ username: username, isLoggedIn: true })
+                this.updateState({ isLoggedIn: true })
                 await user.storeInfo()
             } catch (error) {
                 if (error instanceof Error) {
-                    console.log('Error at login:', error)
+                    console.error('Error at login:', error)
                 } else {
-                    console.log('Unknown error:', error)
+                    console.error('Unknown error:', error)
                 }
                 throw error
             }
@@ -60,7 +76,7 @@ export const useAuthStore = defineStore('auth', {
                 await router.push({ name: 'login' })
             } catch (error) {
                 globalThis.location.pathname = '/login'
-                console.log('Unknown error:', error)
+                console.error('Unknown error:', error)
             }
         },
     },

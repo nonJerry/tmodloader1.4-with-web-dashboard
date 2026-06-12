@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { IS_PRODUCTION, SESSION_BOUND_TOKEN } from '../../config/constants.js';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
-    console.log(`Authenticating request for ${req.session.id}`);
     const accessToken = req.cookies?.accessToken;
 
     if (!accessToken) {

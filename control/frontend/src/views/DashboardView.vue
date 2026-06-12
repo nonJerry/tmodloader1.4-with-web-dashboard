@@ -57,7 +57,7 @@ async function getStatus(): Promise<void> {
 async function sendCommand(command: string): Promise<void> {
   buttonsDisabled.value = true
   try {
-    await api.post(`/${command}`)
+    await api.post(`/${command}`, {});
     message.value = `${command} command sent`
 
     setTimeout(() => {

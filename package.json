@@ -1,7 +1,7 @@
 {
   "name": "terraria-podman",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "workspaces": [
     "control/backend",
     "control/frontend"
@@ -9,6 +9,10 @@
   "scripts": {
     "install:all": "npm install",
     "dev": "concurrently \"npm run dev --workspace control/backend\" \"npm run dev --workspace control/frontend\"",
+    "dev:backend": "npm --workspace control/backend run dev",
+    "dev:frontend": "npm --workspace control/frontend run dev",
+    "full-stack": "cd dev && podman compose up --build -d",
+    "full-stack:docker": "cd dev && docker compose up --build -d",
     "build": "npm run build --workspaces",
     "lint": "npm run lint --workspaces",
     "lint:backend": "npm --workspace control/backend run lint",
@@ -19,5 +23,7 @@
     "cross-env": "^10.1.0",
     "oxlint": "^1.69.0"
   },
-  "allowScripts": {}
+  "overrides": {
+    "glob": "^13.0.6"
+  }
 }

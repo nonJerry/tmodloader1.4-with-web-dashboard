@@ -4,3 +4,5 @@ temp
 
 node_modules
 users.json
+control/redis/redis.conf
+dist

@@ -20,19 +20,21 @@ services:
       - ../control/api:/www/cgi-bin/api
     env_file:
       - .env
-    entrypoint: ["/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6002 -h /www"]
+    entrypoint: [ "/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6002 -h /www" ]
 
   api:
     container_name: 'api'
     build:
       args:
-      - NODE_ENV=development
+        - NODE_ENV=development
       context: ../control/backend
       target: development
     command: npm run start-watch
     image: node:alpine
     ports:
       - '8000:8000'
+    env_file:
+      - ../control/redis/redis.env
     environment:
       JWT_SECRET: ${JWT_SECRET}
       ALLOWED_ORIGINS: http://localhost:5173
@@ -46,6 +48,23 @@ services:
     depends_on:
       - terraria
 
+  redis:
+    image: redis:alpine
+    restart: always
+    healthcheck:
+      test: [ "CMD", "/usr/local/bin/healthcheck.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command: [ "redis-server", "/etc/redis/redis.conf" ]
+    env_file:
+      - ../control/redis/redis.env
+    volumes:
+      - ../control/redis/redis.conf:/etc/redis/redis.conf:Z,ro
+      - ../control/redis/healthcheck.sh:/usr/local/bin/healthcheck.sh:Z,ro
+      - redis_data:/data
+
 secrets:
   users:
     file: ../example.users.json
@@ -53,3 +72,4 @@ secrets:
 volumes:
   back-notused:
   server_data:
+  redis_data:

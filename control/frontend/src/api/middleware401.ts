@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios'
 import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
 /**
  * Middleware - if user lost authentication (401) it gets kicked out
@@ -9,7 +10,7 @@ const middleware401 = async (error: AxiosError): Promise<never> => {
     const status = error.response?.status
     if (status === 401 || status === 419) {
         const auth = useAuthStore()
-        setTimeout(async () => await auth.logout(), 3000)
+        setTimeout(async () => await auth.logout(router), 3000)
         const rejectionError = new Error('You lost your credentials - will be redirected to login page.')
         rejectionError.name = 'PermissionDenied'
         throw rejectionError;

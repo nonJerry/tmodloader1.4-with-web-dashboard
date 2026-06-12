@@ -97,7 +97,7 @@ test.describe('Terraria Server Control page', () => {
         expires: undefined,
       },
       {
-        name: 'x-xsrf-token',
+        name: 'xsrf-token',
         value: 'e6cab63a438f71951fd7a9c3740bb2dd9e3487d455da09eff4a7ea936ad58b22.54bb340541b471ab1d409f0f0ed0d1d2a8218845085e070d673c6322d49406ce',
         url: 'http://localhost:5173',
         httpOnly: false,

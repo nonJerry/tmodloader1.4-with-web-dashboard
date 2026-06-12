@@ -23,5 +23,5 @@ export const { doubleCsrfProtection, invalidCsrfTokenError, generateCsrfToken } 
         secure: IS_PRODUCTION,
         httpOnly: false
     },
-    cookieName: IS_PRODUCTION ? COOKIE_PREFIX + "-xsrf-token" : "x-xsrf-token",
+    cookieName: IS_PRODUCTION ? COOKIE_PREFIX + "-xsrf-token" : "xsrf-token",
 });

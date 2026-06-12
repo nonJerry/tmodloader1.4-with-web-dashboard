@@ -35,32 +35,26 @@ services:
       retries: 3
     ports:
       - 6001:8080
+    env_file:
+      - ./control/redis/redis.env
 
-  laravel9_database:
-    image: mysql:8
-    volumes:
-      - database_api:/var/lib/mysql
-    restart: unless-stopped
+  redis:
+    image: redis:alpine
+    restart: always
     healthcheck:
-      test: mysqladmin -u${DB_USERNAME} -p${DB_PASSWORD} ping -h 127.0.0.1
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-
-  laravel:
-    build: ./control/laravel
-    image: laravel9_api:from_scratch
+      test: [ "CMD", "/usr/local/bin/healthcheck.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    env_file:
+      - ./control/redis/redis.env
     volumes:
-      - ./.env:/var/www/laravel-app/.env
-    depends_on:
-      laravel9_database:
-        condition: service_healthy
-    restart: unless-stopped
-    ports:
-      - "8000:8000"
+      - ./control/redis/redis.conf:/etc/redis/redis.conf:Z,ro
+      - ./control/redis/healthcheck.sh:/usr/local/bin/healthcheck.sh:Z,ro
+      - redis_data:/data
 
 
 volumes:
-  database_api:
+  redis_data:
