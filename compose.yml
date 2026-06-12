@@ -20,7 +20,7 @@ services:
       - ./control/api:/www/cgi-bin/api
     env_file:
       - .env
-    entrypoint: ["/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6000 -h /www"]
+    entrypoint: [ "/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6000 -h /www" ]
 
   web:
     container_name: 'web'
@@ -38,6 +38,32 @@ services:
     env_file:
       - ./control/redis/redis.env
 
+  api:
+    container_name: 'api'
+    build:
+      args:
+        - NODE_ENV=production
+      context: ./control/backend
+      target: production
+    command: npm run start-watch
+    image: node:alpine
+    ports:
+      - '8000:8000'
+    env_file:
+      - ./control/redis/redis.env
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      ALLOWED_ORIGINS: http://web:5173
+    secrets:
+      - users
+    volumes:
+      - ./control/backend/src:/code/src:ro
+      - ./control/backend/package.json:/code/package.json
+      - ./control/backend/package-lock.json:/code/package-lock.json
+      - back-notused:/opt/app/node_modules
+    depends_on:
+      - terraria
+
   redis:
     image: redis:alpine
     restart: always
@@ -47,14 +73,13 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    command: ["redis-server", "/etc/redis/redis.conf"]
+    command: [ "redis-server", "/etc/redis/redis.conf" ]
     env_file:
       - ./control/redis/redis.env
     volumes:
       - ./control/redis/redis.conf:/etc/redis/redis.conf:Z,ro
       - ./control/redis/healthcheck.sh:/usr/local/bin/healthcheck.sh:Z,ro
       - redis_data:/data
-
 
 volumes:
   redis_data:
