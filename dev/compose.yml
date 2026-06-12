@@ -69,6 +69,5 @@ secrets:
     file: ../example.users.json
 
 volumes:
-  back-notused:
   server_data:
   redis_data:
