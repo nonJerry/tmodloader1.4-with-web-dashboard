@@ -23,11 +23,10 @@
 </template>
 
 <script setup lang="ts">
+import { useApi } from '@/api/useAPI'
 import { onMounted, onUnmounted, ref } from 'vue'
 
-
-const BASE_PATH = '/api'
-
+const api = useApi('api')
 const players = ref<string>('0')
 const message = ref<string>('')
 const buttonsDisabled = ref<boolean>(false)
@@ -42,19 +41,13 @@ const commands = [
   'save',
 ]
 
-async function fetchStatus(): Promise<void> {
+async function getStatus(): Promise<void> {
   try {
-    const response = await fetch(`${BASE_PATH}/status`)
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
-    }
-
-    const text = await response.text()
+    const response = await api.get('/status', { responseType: "text" })
+    const text = response.data
     players.value = text.trim()
-
   } catch (error) {
-    console.error(error)
+    console.log(error)
     players.value = '0'
   } finally {
     buttonsDisabled.value = false // buttons only disabled if server is stopped
@@ -64,21 +57,14 @@ async function fetchStatus(): Promise<void> {
 async function sendCommand(command: string): Promise<void> {
   buttonsDisabled.value = true
   try {
-    const response = await fetch(`${BASE_PATH}/${command}`, {
-      method: 'POST',
-    })
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`)
-    }
-
+    await api.post(`/${command}`)
     message.value = `${command} command sent`
 
     setTimeout(() => {
       message.value = ''
     }, 3000)
   } catch (error) {
-    console.error(error)
+    console.log(error)
     message.value = `Failed to send ${command}`
     buttonsDisabled.value = false // avoid having to reload on error
   }
@@ -87,10 +73,10 @@ async function sendCommand(command: string): Promise<void> {
 let intervalId: ReturnType<typeof setInterval>;
 
 onMounted(() => {
-  fetchStatus()
+  getStatus()
 
   intervalId = globalThis.setInterval(() => {
-    fetchStatus()
+    getStatus()
   }, 5000)
 })
 

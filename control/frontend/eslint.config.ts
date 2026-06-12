@@ -25,6 +25,9 @@ export default defineConfigWithVueTs(
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+       rules: {
+      'playwright/expect-expect': ['error', { "assertFunctionPatterns": ["^assert.*", "^verify.*", "^expect.*"] }]
+    }
   },
 
   {

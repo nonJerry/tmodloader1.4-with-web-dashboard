@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "module": "ESNext",
-        "moduleResolution": "Bundler",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "target": "ES2024",
         "experimentalDecorators": false,
         "strictNullChecks": true,
@@ -18,7 +18,9 @@
         "sourceMap": true
     },
     "include": [
-        "**/*.ts"
+        "**/*.ts",
+        "src/services/status.service.ts",
+        "src/services/status.service.ts"
     ],
     "exclude": [
         "node_modules",

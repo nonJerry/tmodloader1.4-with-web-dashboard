@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import authMiddleware from './middleware/auth-middleware'
 
-import Dashboard from '@/views/Dashboard.vue'
-import Login from '@/views/auth/Login.vue'
+import Dashboard from '@/views/DashboardView.vue'
+import Login from '@/views/auth/LoginView.vue'
 
 
 const router = createRouter({

@@ -1,0 +1,23 @@
+{
+  "name": "terraria-podman",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": [
+    "control/backend",
+    "control/frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "dev": "concurrently \"npm run dev --workspace control/backend\" \"npm run dev --workspace control/frontend\"",
+    "build": "npm run build --workspaces",
+    "lint": "npm run lint --workspaces",
+    "lint:backend": "npm --workspace control/backend run lint",
+    "lint:frontend": "npm --workspace control/frontend run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "cross-env": "^10.1.0",
+    "oxlint": "^1.69.0"
+  },
+  "allowScripts": {}
+}

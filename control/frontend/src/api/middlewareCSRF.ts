@@ -19,15 +19,17 @@ const getCookiesArray = (): string[] => {
  */
 const middlewareCSRF = async (axiosConfig: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     const cookies = getCookiesArray()
-    const isTokenMissing = !cookies.includes('XSRF-TOKEN')
+    const isTokenMissing = !cookies.includes('x-xsrf-token') // TODO adapt to env
+
+    // TODO Implement dual http only and normal cookie
 
     const methodsNeedCSRF: AxiosRequestConfig['method'][] = ['post', 'put', 'delete']
     const doesMethodRequireCSRF = methodsNeedCSRF.includes(axiosConfig.method ?? 'get')
 
     if (isTokenMissing && doesMethodRequireCSRF) {
-        const pathCSRF = '/sanctum/csrf-cookie'
+        const pathCSRF = 'csrf-token'
         const apiHost = import.meta.env.API_HOST ?? 'http://localhost:8000' // TODO
-        const urlToCall = `${apiHost}${pathCSRF}`
+        const urlToCall = `${apiHost}/${pathCSRF}`
 
         await axios.get(urlToCall, { withCredentials: true })
     }

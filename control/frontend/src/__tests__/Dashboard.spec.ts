@@ -1,22 +1,38 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
-import Dashboard from '@/views/Dashboard.vue'
+import Dashboard from '@/views/DashboardView.vue'
+
+import { useApi } from '@/api/useAPI'
+
+
+vi.mock('@/api/useAPI', () => ({
+  useApi: vi.fn<() => { get: () => Promise<StatusResponse>; post: () => Promise<object> }>(),
+}))
+
+type StatusResponse = { data: string }
+const mockedUseApi = vi.mocked(useApi)
+
 
 async function mountWithPlayers(players: string) {
-  vi.stubGlobal(
-    'fetch',
-    vi.fn(() => {
-      return Promise.resolve({
-        ok: true,
-        text: () => Promise.resolve(players),
-      })
-    },
-    ),
-  )
-  const wrapper = mount(Dashboard)
+  const mockGet = vi.fn<() => Promise<StatusResponse>>().mockResolvedValue({
+    data: players,
+  })
+  mockedUseApi.mockReturnValue({ get: mockGet } as any)
 
+  const wrapper = mount(Dashboard)
   await flushPromises()
   return wrapper
+}
+
+function deferred<T>() {
+  let resolve!: (value: T | PromiseLike<T>) => void
+  let reject!: (reason?: any) => void
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
 }
 
 describe('Dashboard', () => {
@@ -44,16 +60,19 @@ describe('Dashboard', () => {
   )
 
   it('updates when player count changes', async () => {
-    const fetchMock = vi.fn<() => Promise<{ ok: boolean; text: () => Promise<string> }>>()
-      .mockResolvedValueOnce({ ok: true, text: async () => '1' })
-      .mockResolvedValueOnce({ ok: true, text: async () => '4' })
-    vi.stubGlobal('fetch', fetchMock)
+    /* oxlint-disable-next-line @vitest/require-mock-type-parameters */
+    const mockGet = vi.fn()
+      .mockResolvedValueOnce({ data: '1' })
+      .mockResolvedValueOnce({ data: '4' })
+    mockedUseApi.mockReturnValue({ get: mockGet } as any)
+
+
     const wrapper = mount(Dashboard)
 
     await flushPromises()
     expect(wrapper.find('.player-count').text()).toContain('1')
 
-    await (wrapper.vm as any).fetchStatus()
+    await (wrapper.vm as any).getStatus()
     await flushPromises()
     expect(wrapper.find('.player-count').text()).toContain('4')
   })
@@ -77,25 +96,31 @@ describe('Buttons', () => {
 
     buttons.forEach((btn) => {
       const label = btn.text()
-      if (label === 'start') {
-        expect(btn.element.disabled).toBe(false)
-      } else {
-        expect(btn.element.disabled).toBe(true)
-      }
+      expect(btn.element.disabled).toBe(label !== 'start')
     })
   })
 
   it('are disabled immediately on click until next status update', async () => {
-    const wrapper = await mountWithPlayers('1')
+    const request = deferred<object>()
+    const mockGet = vi.fn<() => Promise<StatusResponse>>().mockResolvedValue({ data: '1' })
+    const mockPost = vi.fn<() => Promise<object>>().mockReturnValue(request.promise)
+    mockedUseApi.mockReturnValue({ get: mockGet, post: mockPost } as any)
 
-    const anyBtn = wrapper.find('button')
-    let buttons = wrapper.findAll('button')
+    const wrapper = mount(Dashboard)
+    await flushPromises()
+
+    const buttons = wrapper.findAll('button')
     buttons.forEach(btn => expect(btn.element.disabled).toBe(false))
 
+    const anyBtn = wrapper.find('button')
     await anyBtn.trigger('click')
     wrapper.findAll('button').forEach(btn => expect(btn.element.disabled).toBe(true))
 
-    await (wrapper.vm as any).fetchStatus()
+    request.resolve({})
+    await flushPromises()
+
+    await (wrapper.vm as any).getStatus()
+    await flushPromises()
     wrapper.findAll('button').forEach(btn => expect(btn.element.disabled).toBe(false))
   })
 })

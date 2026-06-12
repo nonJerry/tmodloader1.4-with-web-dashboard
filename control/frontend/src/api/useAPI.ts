@@ -1,6 +1,6 @@
 import axios from 'axios'
-import middleware401 from './middleware401'
-import middlewareCSRF from './middlewareCSRF'
+import middleware401 from './middleware401.js'
+import middlewareCSRF from './middlewareCSRF.js'
 
 /**
  * Initialize Axios instance to call the API
@@ -13,9 +13,9 @@ export const useApi = (endpoint = 'api') => {
 	let baseURL
 
 	if (endpoint === 'api') {
-		baseURL = API_HOST + API_PATH || '/cgi-bin/api'
+		baseURL = API_HOST + API_PATH || 'http://localhost:8000/api'
 	} else if (endpoint === 'web') {
-		baseURL = API_HOST || 'http://localhost:8000' // TODO: NEEDED?
+		baseURL = API_HOST || 'http://localhost:8000'
 	}
 
 	const axiosInstance = axios.create({
@@ -24,8 +24,8 @@ export const useApi = (endpoint = 'api') => {
 		withCredentials: true,
 	})
 
-	axiosInstance.interceptors.request.use( middlewareCSRF, err => Promise.reject(err)) 
-
+	axiosInstance.interceptors.request.use( middlewareCSRF, err => Promise.reject(err))
+	
 	axiosInstance.interceptors.response.use(resp => resp, middleware401)
 
 	return axiosInstance

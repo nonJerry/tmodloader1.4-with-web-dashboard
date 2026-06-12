@@ -2,22 +2,22 @@ import { defineStore } from 'pinia'
 import { useApi } from '@/api/useAPI'
 
 export interface UserState {
-	id: number | null,
-	name: string
+	username: string,
+	isAuthenticated: boolean;
 }
 
 function getStoredUser(): UserState {
 	const stored = localStorage.getItem('USER_INFO')
-	if (!stored) return { id: null, name: 'guest' }
+	if (!stored) return { username: 'guest', isAuthenticated: false }
 
 	try {
 		const parsed = JSON.parse(stored)
 		return {
-			id: parsed.id ?? null,
-			name: parsed.name ?? 'guest'
+			username: parsed.username ?? 'guest',
+			isAuthenticated: parsed.isAuthenticated ?? false
 		}
 	} catch {
-		return { id: null, name: 'guest' }
+		return { username: 'guest', isAuthenticated: false }
 	}
 }
 
@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', {
 
 	actions: {
 		updateState(payload: Partial<UserState>) {
-			let newUserState = { ...this.$state, ...payload }
+			const newUserState = { ...this.$state, ...payload }
 			localStorage.removeItem('USER_INFO')
 			localStorage.setItem('USER_INFO', JSON.stringify(newUserState))
 			this.$reset() // maybe $patch

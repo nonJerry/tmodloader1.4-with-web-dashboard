@@ -4,7 +4,7 @@
   </Component>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useRoute, RouterView } from 'vue-router'
 import { computed } from 'vue'
 
@@ -17,9 +17,10 @@ const layouts = {
 
 const route = useRoute()
 
+type LayoutKey = keyof typeof layouts
 const currentLayout = computed(() => {
-  const layoutKey = route.meta.layout || 'default'
-  return layouts[layoutKey] || DefaultLayout
+  const layoutKey = (route.meta.layout as LayoutKey) ?? 'default'
+  return layouts[layoutKey]
 })
 
 </script>

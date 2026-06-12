@@ -7,7 +7,7 @@ const web = useApi('web')
 
 
 export interface AuthState {
-    id: string
+    username: string
     isLoggedIn: boolean
 }
 
@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
         return stored
             ? JSON.parse(stored)
             : {
-                id: 'guest',
+                username: 'guest',
                 isLoggedIn: false,
             }
     },
@@ -33,15 +33,15 @@ export const useAuthStore = defineStore('auth', {
                 JSON.stringify(this.$state)
             )
         },
-        async login({ id, password }: { id: string; password: string }) {
+        async login({ username, password }: { username: string; password: string }) {
             const user = useUserStore()
             try {
-                await web.post('/login', { id, password })
-                this.updateState({ isLoggedIn: true })
+                await web.post('/login', { username, password })
+                this.updateState({ username: username, isLoggedIn: true })
                 await user.storeInfo()
             } catch (error) {
                 if (error instanceof Error) {
-                    console.log('Error at login:', error.message)
+                    console.log('Error at login:', error)
                 } else {
                     console.log('Unknown error:', error)
                 }

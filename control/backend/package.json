@@ -4,25 +4,36 @@
     "type": "module",
     "main": "index.ts",
     "scripts": {
-        "start": "ts-node src/index.ts",
-        "start-watch": "nodemon src/index.ts --inspect=0.0.0.0:9229",
-        "start-wait-debuger": "nodemon src/index.ts --inspect-brk=0.0.0.0:9229",
+        "start": "npx tsc && node dist/index.js",
+        "start-watch": "npx tsx watch src/index.ts",
+        "dev": "cross-env NODE_ENV=development npx tsx watch src/index.ts",
         "test": "cross-env NODE_ENV=test PORT=8081 mocha --timeout 10000 --exit --inspect=0.0.0.0:9230",
         "test-watch": "nodemon --exec \"npm test\"",
-        "test-wait-debuger": "cross-env NODE_ENV=test PORT=8081 mocha --no-timeouts --exit --inspect-brk=0.0.0.0:9230"
+        "test-wait-debuger": "cross-env NODE_ENV=test PORT=8081 mocha --no-timeouts --exit --inspect-brk=0.0.0.0:9230",
+        "lint": "oxlint . --fix"
     },
     "dependencies": {
         "bcrypt": "^6.0.0",
+        "connect-redis": "^9.0.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.6",
+        "csrf-csrf": "^4.0.3",
         "express": "^5.2.1",
+        "express-session": "^1.19.0",
         "helmet": "^8.2.0",
+        "ioredis": "^5.11.1",
         "jsonwebtoken": "^9.0.3",
         "undici": "^8.4.1"
     },
     "devDependencies": {
         "@types/bcrypt": "^6.0.0",
+        "@types/cookie-parser": "^1.4.10",
+        "@types/cors": "^2.8.19",
         "@types/express": "^5.0.6",
+        "@types/express-session": "^1.19.0",
         "@types/jsonwebtoken": "^9.0.10",
         "nodemon": "^3.1.14",
+        "oxlint": "^1.69.0",
         "ts-node": "^10.9.2",
         "typescript": "^6.0.3"
     },

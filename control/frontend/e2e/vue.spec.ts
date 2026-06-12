@@ -1,21 +1,122 @@
 import { test, expect, Page } from '@playwright/test'
 
-
 async function getStatus(page: Page, value: string) {
   await page.route('**/status', (route) => {
     route.fulfill({ status: 200, contentType: 'text/plain', body: value })
   })
 }
 
+function initClock(page: Page) {
+  return page.clock.install({ time: Date.now() })
+}
+
+function nextStatus(page: Page) {
+  return page.clock.fastForward(5000)
+}
+
+async function mockPost(page: Page) {
+  await page.route('**/api/*', async route => {
+    const request = route.request()
+    if (request.method() === 'POST') {
+      // create a deferred promise to hold this route
+      route.fulfill({ status: 200, body: '{}' })
+    } else {
+      route.continue()
+    }
+  })
+}
+
+function expectLogin(page: Page) {
+  return Promise.all([
+    expect(page).toHaveURL('/login'),
+    expect(page.getByRole('textbox', { name: 'What may go here?' })).toBeVisible(),
+    expect(page.getByRole('textbox', { name: 'The second riddle?' })).toBeVisible(),
+    expect(page.getByRole('button', { name: 'Mystery Function' })).toBeVisible(),
+    expect(page.locator('.button-grid')).toBeHidden()
+  ])
+}
+
+function expectDashboard(page: Page) {
+  return Promise.all([
+    expect(page).toHaveURL('/'),
+    expect(page.getByRole('button', { name: 'Logout' })).toBeVisible(),
+    expect(page.locator('.button-grid')).toBeVisible(),
+    expect(page.getByRole('textbox', { name: 'What may go here?' })).toBeHidden(),
+    expect(page.getByRole('textbox', { name: 'The second riddle?' })).toBeHidden(),
+    expect(page.getByRole('button', { name: 'Mystery Function' })).toBeHidden(),
+  ])
+}
+
+async function loginAs(page: Page, username: string, password: string) {
+  await page.getByRole('textbox', { name: 'What may go here?' }).fill(username)
+  await page.getByRole('textbox', { name: 'The second riddle?' }).fill(password)
+  await page.getByRole('button', { name: 'Mystery Function' }).click()
+}
+
 test.describe('Terraria Server Control page', () => {
-  test('renders title', async ({ page }) => {
+
+  test.beforeEach(async ({ page, context }) => {
+
+    await context.setStorageState({
+      cookies: [],
+      origins: [
+        {
+          origin: 'http://localhost:5173',
+          localStorage: [
+            {
+              name: 'AUTH_STATE',
+              value: JSON.stringify({ username: 'alice', isLoggedIn: true })
+            },
+            {
+              name: 'USER_INFO',
+              value: JSON.stringify({ username: 'alice' })
+            }
+          ]
+        }
+      ]
+    }
+    )
+
+    await context.addCookies([
+      {
+        name: 'refreshToken',
+        value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwiaWF0IjoxNzgxMjI2MDQ5LCJleHAiOjE4MTI3ODM2NDksImF1ZCI6ImNoYWxsZW5nZXJzIiwiaXNzIjoidGVycmFyaWEtY29udHJvbCJ9.mONz0rwxTckGt2RgpDW0jbjXWj6uavSH8eQJ1ls-AWA',
+        url: 'http://localhost:5173',
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        expires: 1812762951.984077,
+      },
+      {
+        name: 'accessToken',
+        value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwic2Vzc2lvbklkIjoicV9UMTd4VmJXdDEwWkp1WFlXS1RqcGI1cVhHbFctdHYiLCJpYXQiOjE3ODEyMjYwNDksImV4cCI6MTc4MTIyNjEwOSwiYXVkIjoiY2hhbGxlbmdlcnMiLCJpc3MiOiJ0ZXJyYXJpYS1jb250cm9sIn0.zG-ggMYMUWSWoaDBhUDtG0B0ucpAmxA9KwslSVdr2-o',
+        url: 'http://localhost:5173',
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        expires: undefined,
+      },
+      {
+        name: 'x-xsrf-token',
+        value: 'e6cab63a438f71951fd7a9c3740bb2dd9e3487d455da09eff4a7ea936ad58b22.54bb340541b471ab1d409f0f0ed0d1d2a8218845085e070d673c6322d49406ce',
+        url: 'http://localhost:5173',
+        httpOnly: false,
+        secure: false,
+        sameSite: 'Lax',
+        expires: undefined,
+      },
+    ])
+
     await page.goto('/')
+
+  });
+
+  test('renders title', async ({ page }) => {
     await expect(page.locator('h1')).toHaveText('Terraria Server Control')
   })
 
   test('renders all command buttons', async ({ page }) => {
     const commands = ['start', 'stop', 'save', 'dawn', 'noon', 'dusk', 'midnight']
-    await page.goto('/')
 
     for (const cmd of commands) {
       await expect(page.locator('button', { hasText: cmd })).toHaveCount(1)
@@ -33,18 +134,17 @@ test.describe('Terraria Server Control page', () => {
   }
 
   test('updates when player count changes', async ({ page }) => {
-    let call = 0
-    await page.route('**/cgi-bin/api/status', (route) => {
-      call++
-      const value = call === 1 ? '1' : '4'
-      route.fulfill({ status: 200, contentType: 'text/plain', body: value })
-    })
+    /* Install before page goto so that interval uses fake clock */
+    await initClock(page)
     await page.goto('/')
 
+    await getStatus(page, '1')
+    await nextStatus(page)
     const playerCount = page.locator('.player-count')
     await expect(playerCount).toHaveText('1')
 
-    await page.waitForResponse('**/cgi-bin/api/status')
+    await getStatus(page, '4')
+    await nextStatus(page) // Get next status
     await expect(playerCount).toHaveText('4')
   })
 
@@ -53,25 +153,23 @@ test.describe('Terraria Server Control page', () => {
     await getStatus(page, 'STOPPED')
     await page.goto('/')
 
-    const buttons = page.getByRole('button')
+    const buttons = page.locator('.button-grid').getByRole('button')
     const count = await buttons.count()
 
     for (let i = 0; i < count; i++) {
       const button = buttons.nth(i)
       const label = (await button.textContent())?.trim()
 
-      if (label === 'start') {
-        await expect(button).toBeEnabled()
-      } else {
-        await expect(button).toBeDisabled()
-      }
+      await expect(button).toBeEnabled({ enabled: label === 'start' })
     }
   })
 
   test('buttons are disabled immediately on click until next status update', async ({ page }) => {
+    await initClock(page)
     await page.goto('/')
 
-    const buttons = page.getByRole('button')
+    await mockPost(page)
+    const buttons = page.locator('.button-grid').getByRole('button')
     const count = await buttons.count()
 
     for (let i = 0; i < count; i++) {
@@ -85,11 +183,85 @@ test.describe('Terraria Server Control page', () => {
       await expect(buttons.nth(i)).toBeDisabled()
     }
 
-    // Re-enabled on status update
     await getStatus(page, '1')
+    await nextStatus(page)
 
     for (let i = 0; i < count; i++) {
       await expect(buttons.nth(i)).toBeEnabled()
     }
   })
+})
+
+test.describe('Login', () => {
+
+
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/login')
+  })
+
+  test('is shown instead of main page when user is not logged in', async ({ page }) => {
+    page.goto('/')
+    await expectLogin(page)
+  })
+
+
+
+  test('requires username and password', async ({ page }) => {
+
+    await page.getByRole('button', { name: 'Mystery Function' }).click()
+    await expectLogin(page)
+
+    await page.getByRole('textbox', { name: 'What may go here?' }).fill('alice')
+    await page.getByRole('button', { name: 'Mystery Function' }).click()
+    await expectLogin(page)
+
+
+    await loginAs(page, 'alice', 'alicePassword')
+    await expectDashboard(page)
+  })
+
+  test('is required after refreshToken expired', async ({ page, context }) => {
+    await initClock(page)
+    await page.goto('/')
+    await loginAs(page, 'alice', 'alicePassword')
+    await expectDashboard(page)
+
+    const refreshCookie = (await context.cookies()).find(cookie => cookie.name === 'refreshToken')
+    await context.addCookies([
+      {
+        name: 'accessToken',
+        value: refreshCookie!.value,
+        domain: refreshCookie!.domain,
+        path: refreshCookie!.path,
+        expires: Math.floor(Date.now() / 1000) - 60,
+      },
+    ])
+    
+    await page.goto('/')
+    await nextStatus(page)
+    await expectLogin(page)
+  })
+
+  test('is not necessary if accessToken is expired but refreshToken is valid', async ({ page, context }) => {
+    await initClock(page)
+    await page.goto('/')
+    await loginAs(page, 'alice', 'alicePassword')
+    await expectDashboard(page)
+
+    const accessCookie = (await context.cookies()).find(cookie => cookie.name === 'accessToken')
+    await context.addCookies([
+      {
+        name: 'accessToken',
+        value: accessCookie!.value,
+        domain: accessCookie!.domain,
+        path: accessCookie!.path,
+        expires: Math.floor(Date.now() / 1000) - 60,
+      },
+    ])
+
+    await page.goto('/')
+    await expectDashboard(page)
+  })
+
 })

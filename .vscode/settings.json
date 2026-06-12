@@ -1,3 +1,4 @@
 {
-    "js/ts.tsdk.path": ""
+    "js/ts.tsdk.path": "",
+    "oxc.enable.oxlint": true
 }
