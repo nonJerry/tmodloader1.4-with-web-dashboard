@@ -1,8 +1,9 @@
 #!/bin/sh
-
+pipe=/tmp/busy.pipe
 printf "Content-Type: text/plain\r\n\r\n"
 
 if [ ! "$(pgrep -f tmux)" ]; then
+    echo "Terraria server is not running" >> $pipe
     if [ "$PATH_INFO" != "/start" ]; then
         echo "STOPPED"
         exit 0
@@ -30,7 +31,9 @@ case "$REQUEST_METHOD" in
     POST)
         case "$PATH_INFO" in
             /stop)
-                say $TMOD_SHUTDOWN_MESSAGE
+                echo "Received command to stop server" >> $pipe
+
+                tmux send-keys "say $TMOD_SHUTDOWN_MESSAGE" Enter
                 sleep 3
                 tmux send-keys "exit" Enter
                 kill $(pgrep -f autosave.sh)
@@ -38,42 +41,59 @@ case "$REQUEST_METHOD" in
                 ;;
 
             /start)
-                pgrep -f terraria-server >/dev/null || /terraria-server/entrypoint.sh &
+                echo "Received command to start server" >> $pipe
+
+                cd /terraria-server
+                pgrep -f terraria-server >/dev/null || ./entrypoint.sh &
                 echo "OK"
                 ;;
 
             /midnight)
+                echo "Received command to set time to midnight" >> $pipe
+
                 tmux send-keys "midnight" Enter
                 echo "OK"
                 ;;
 
             /dawn)
+                echo "Received command to set time to dawn" >> $pipe
+
                 tmux send-keys "dawn" Enter
                 echo "OK"
                 ;;
 
             /noon)
+                echo "Received command to set time to noon" >> $pipe
+
                 tmux send-keys "noon" Enter
                 echo "OK"
                 ;;
 
             /dusk)
+                echo "Received command to set time to dusk" >> $pipe
+
                 tmux send-keys "dusk" Enter
                 echo "OK"
                 ;;
 
             /save)
+                echo "Received command to save world" >> $pipe
+
                 tmux send-keys "save" Enter
                 echo "OK"
                 ;;
 
             *)
+                echo "Received request on unknown endpoint" >> $pipe
+
                 echo "Unknown POST endpoint"
                 ;;
         esac
         ;;
 
     *)
+         echo "Received request using a not supported method" >> $pipe
+
         echo "Method Not Allowed"
         ;;
 esac
