@@ -27,7 +27,7 @@ export const createToken = (username: string, sessionId: string | undefined = un
 export const createAccessToken = (refreshToken: string, sessionId: string) => {
     try {
         const payload = verifyToken(refreshToken)
-        return createToken(payload.username, sessionId, '1m');
+        return createToken(payload.username, sessionId, '1h');
     } catch (err) {
         console.error('Invalid refresh token:', err);
         throw err
