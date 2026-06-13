@@ -54,6 +54,7 @@ export const useAuthStore = defineStore('auth', {
             try {
                 await web.post('/login', { username, password })
                 this.updateState({ isLoggedIn: true })
+                this.initializeCsrfToken()
                 await user.storeInfo()
             } catch (error) {
                 if (error instanceof Error) {
