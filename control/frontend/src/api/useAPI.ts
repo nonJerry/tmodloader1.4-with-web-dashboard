@@ -9,7 +9,7 @@ import middlewareCSRF from './middlewareCSRF.js'
  */
 
 const useEndpoint = (endpoint = 'api') => {
-	const { API_HOST, API_PATH } = import.meta.env
+	const { VITE_API_HOST: API_HOST, VITE_API_PATH: API_PATH } = import.meta.env
 
 	let baseURL
 
