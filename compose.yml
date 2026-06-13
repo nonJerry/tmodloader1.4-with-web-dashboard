@@ -20,7 +20,7 @@ services:
       - ./control/api:/www/cgi-bin/api
     env_file:
       - .env
-    entrypoint: [ "/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6000 -h /www" ]
+    entrypoint: [ "/bin/sh", "-c", "./entrypoint.sh & exec busybox httpd -f -p 6002 -h /www" ]
 
   web:
     container_name: 'web'
