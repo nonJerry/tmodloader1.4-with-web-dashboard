@@ -8,6 +8,10 @@ function handleCommand(command: string) {
                 `${API_URL}/${command}`,
                 {
                     method: 'POST',
+                    headers: {
+                        Accept: 'text/plain',
+                    },
+                    body: ''
                 }
             )
 
