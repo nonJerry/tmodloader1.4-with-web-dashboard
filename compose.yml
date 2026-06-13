@@ -62,8 +62,6 @@ services:
       - ./control/backend/package.json:/code/package.json
       - ./control/backend/package-lock.json:/code/package-lock.json
       - node_modules:/code/node_modules
-    depends_on:
-      - terraria
 
   redis:
     image: redis:alpine

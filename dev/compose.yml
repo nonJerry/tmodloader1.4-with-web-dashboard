@@ -30,12 +30,12 @@ services:
       context: ../control/backend
       target: development
     command: npm run start-watch
-    image: node:alpine
     ports:
       - '8000:8000'
     env_file:
       - ../control/redis/redis.env
     environment:
+      NODE_ENV: development
       JWT_SECRET: ${JWT_SECRET}
       ALLOWED_ORIGINS: http://localhost:5173
     secrets:
@@ -44,8 +44,7 @@ services:
       - ../control/backend/src:/code/src:ro
       - ../control/backend/package.json:/code/package.json
       - ../control/backend/package-lock.json:/code/package-lock.json
-    depends_on:
-      - terraria
+      - node_modules:/code/node_modules
 
   redis:
     image: redis:alpine
@@ -71,3 +70,4 @@ secrets:
 volumes:
   server_data:
   redis_data:
+  node_modules:
