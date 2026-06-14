@@ -11,6 +11,7 @@ import statusRouter from './api/routes/status.routes.js';
 import userRouter from './api/routes/users.route.js';
 import authRouter from './api/routes/auth.routes.js'
 import session from './config/session.js';
+import { startStatusPolling } from './services/status.service.js';
 
 
 console.log(`Running in production: ${IS_PRODUCTION}`)
@@ -45,6 +46,8 @@ app.use('/api', statusRouter)
 app.use('/api', userRouter)
 app.use('/api', commandsRouter)
 app.use(errorHandler)
+
+startStatusPolling()
 
 app.listen(8000, () => {
     console.log('Listening on port 8000')
