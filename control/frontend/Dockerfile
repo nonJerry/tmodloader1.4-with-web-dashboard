@@ -19,5 +19,6 @@ FROM nginx:stable-alpine AS production
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/web.conf
 COPY --from=build /app/dist /usr/share/nginx/html
+RUN npm prune --omit=dev
 CMD ["nginx", "-g", "daemon off;"]
 EXPOSE 8080
