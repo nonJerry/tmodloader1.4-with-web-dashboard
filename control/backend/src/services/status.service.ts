@@ -16,10 +16,10 @@ async function checkStatus() {
         } else {
             currentStatus = Number(text) ? text : '0'
         }
-        console.log(`Current Status: ${currentStatus}`);
 
     } catch (err) {
         console.error('Status check failed:', err);
+        currentStatus = 'UNKNOWN';
     }
 }
 
