@@ -23,6 +23,7 @@ app.use(corsConfig);
 app.use(cookieParser(SESSION_SECRET));
 app.use(express.json());
 app.use(session);
+app.set('trust proxy', 'loopback, uniquelocal');
 
 // Log all requests
 app.use((req, res, next) => {
