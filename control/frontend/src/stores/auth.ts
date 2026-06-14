@@ -21,7 +21,6 @@ export const useAuthStore = defineStore('auth', {
     actions: {
         async initAuth() {
             await useApi('api').get('/me').then(() => {
-                console.log('User is logged in')
                 this.updateState({ isLoggedIn: true })
             }).catch(() => {
                 // Not logged in

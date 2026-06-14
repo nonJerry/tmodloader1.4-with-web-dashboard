@@ -6,7 +6,6 @@ const middlewareCSRF = async (axiosConfig: InternalAxiosRequestConfig): Promise<
     
     const authStore = useAuthStore()
     if (!authStore.csrfToken) {
-        console.log('Initializing CSRF token...')
         await authStore.initializeCsrfToken()
     }
     axiosConfig.headers['x-csrf-token'] = authStore.csrfToken
