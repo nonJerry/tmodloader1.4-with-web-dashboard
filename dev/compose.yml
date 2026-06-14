@@ -5,7 +5,7 @@ services:
     image: terraria:local
     restart: unless-stopped
     healthcheck:
-      test: "nc -z 127.0.0.1 6000 || exit 1"
+      test: "nc -z 127.0.0.1 6002 || exit 1"
       interval: 30s
       timeout: 5s
       start_period: 10s
@@ -17,10 +17,31 @@ services:
       - 6002
     volumes:
       - server_data:/data
-      - ../control/api:/www/cgi-bin/api
+      - ../control/api:/www/cgi-bin/api:Z,ro
     env_file:
       - .env
     entrypoint: [ "/bin/sh", "-c", "./entrypoint.sh & tail -F /tmp/busy.pipe & exec busybox httpd -f -p 6002 -h /www" ]
+
+  web:
+    container_name: 'web'
+    build:
+      context: ../control/frontend
+      target: development
+    image: terraria/web-server:local
+    restart: unless-stopped
+    healthcheck:
+      test: "wget --quiet --tries=1 --spider http://127.0.0.1:5173 || exit 1"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    ports:
+      - 5173:5173
+    volumes:
+      - ../control/frontend:/app:Z,ro
+      - /app/node_modules
+    env_file:
+      - ../control/frontend/.env
 
   api:
     container_name: 'api'
@@ -41,10 +62,10 @@ services:
     secrets:
       - users
     volumes:
-      - ../control/backend/src:/code/src:ro
-      - ../control/backend/package.json:/code/package.json
-      - ../control/backend/package-lock.json:/code/package-lock.json
-      - node_modules:/code/node_modules
+      - ../control/backend/src:/code/src:Z,ro
+      - ../control/backend/package.json:/code/package.json:Z,ro
+      - ../control/backend/package-lock.json:/code/package-lock.json:Z,ro
+      - /code/node_modules
 
   redis:
     image: redis:alpine

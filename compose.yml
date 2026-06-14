@@ -17,14 +17,16 @@ services:
       - '6000'
     volumes:
       - /srv/terraria:/data:z
-      - ./control/api:/www/cgi-bin/api
+      - ./control/api:/www/cgi-bin/api:Z,ro
     env_file:
       - .env
     entrypoint: [ "/bin/sh", "-c", "./entrypoint.sh & tail -F /tmp/busy.pipe & exec busybox httpd -f -p 6002 -h /www" ]
 
   web:
     container_name: 'web'
-    build: ./control/frontend
+    build: 
+      context: ./control/frontend
+      target: production
     image: terraria/web-server:local
     restart: unless-stopped
     healthcheck:
@@ -58,10 +60,10 @@ services:
     secrets:
       - users
     volumes:
-      - ./control/backend/src:/code/src:ro
-      - ./control/backend/package.json:/code/package.json
-      - ./control/backend/package-lock.json:/code/package-lock.json
-      - node_modules:/code/node_modules
+      - ./control/backend/src:/code/src:Z,ro
+      - ./control/backend/package.json:/code/package.json:Z,ro
+      - ./control/backend/package-lock.json:/code/package-lock.json:Z,ro
+      - /code/node_modules
 
   redis:
     image: redis:alpine
@@ -82,7 +84,6 @@ services:
 
 volumes:
   redis_data:
-  node_modules:
 
 secrets:
   users:

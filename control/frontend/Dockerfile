@@ -1,17 +1,23 @@
-FROM node:alpine AS build
-
-# Build app
+FROM node:lts-alpine AS dependencies
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
+
+FROM dependencies AS build
 COPY . .
 RUN npm run build
 
 
-# Serve
-FROM nginx:alpine
+# Requires code mounted to /app if you want live updates
+FROM dependencies AS development
+COPY . .
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+
+FROM nginx:stable-alpine AS production
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/web.conf
 COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080
