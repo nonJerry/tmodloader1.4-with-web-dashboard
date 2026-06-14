@@ -45,11 +45,14 @@ case "$REQUEST_METHOD" in
 
                 cd /terraria-server
                 pgrep -f terraria-server >/dev/null || ./entrypoint.sh &
+
+                echo "Initiated server start" >> $pipe
                 echo "OK"
                 ;;
 
             /midnight)
                 echo "Received command to set time to midnight" >> $pipe
+                tmux send-keys "say Setting time to midnight" Enter
 
                 tmux send-keys "midnight" Enter
                 echo "OK"
@@ -57,6 +60,8 @@ case "$REQUEST_METHOD" in
 
             /dawn)
                 echo "Received command to set time to dawn" >> $pipe
+                tmux send-keys "say Setting time to dawn" Enter
+
 
                 tmux send-keys "dawn" Enter
                 echo "OK"
@@ -64,6 +69,7 @@ case "$REQUEST_METHOD" in
 
             /noon)
                 echo "Received command to set time to noon" >> $pipe
+                tmux send-keys "say Setting time to noon" Enter
 
                 tmux send-keys "noon" Enter
                 echo "OK"
@@ -71,6 +77,7 @@ case "$REQUEST_METHOD" in
 
             /dusk)
                 echo "Received command to set time to dusk" >> $pipe
+                tmux send-keys "say Setting time to dusk" Enter
 
                 tmux send-keys "dusk" Enter
                 echo "OK"
