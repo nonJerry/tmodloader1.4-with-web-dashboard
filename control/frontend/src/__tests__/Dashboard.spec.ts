@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, type Mock } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import Dashboard from '@/views/DashboardView.vue'
 import { useApi } from '@/api/useAPI'
@@ -16,7 +16,7 @@ const mockedUseApi = vi.mocked(useApi)
 
 
 
-async function mountWithPlayers(players: string, apiMocks: ApiMocks = {}) {
+async function mountWithPlayers(players: string, apiMocks: { post?: Mock<() => Promise<object>> } = {}) {
   const mockGet = vi.fn<() => Promise<StatusResponse>>().mockResolvedValue({
     data: players,
   })
@@ -116,6 +116,17 @@ describe('Buttons', () => {
     })
   })
 
+  it.each(['STOPPING', 'STARTING', 'randomValue', 'ボタンが無効になったはず'])(
+    'are disabled when status is %s',
+    async (status) => {
+      const wrapper = await mountWithPlayers(status)
+      const buttons = wrapper.findAll('button')
+
+      buttons.forEach((btn) => {
+        expect(btn.element.disabled).toBe(true)
+      })
+    })
+
   it('are disabled immediately on click until next status update', async () => {
     const request = deferred<object>()
     const mockGet = vi.fn<() => Promise<StatusResponse>>().mockResolvedValue({ data: '1' })
@@ -146,7 +157,7 @@ describe('Buttons', () => {
       const mockPost = vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 })
       mockedUseApi.mockReturnValue({ post: mockPost } as any)
 
-      const wrapper = mount(Dashboard)
+      const wrapper = await mountWithPlayers('1', { post: mockPost })
       await flushPromises()
 
       const button = wrapper.findAll('.button-grid button').find(btn => btn.text() === command)!
@@ -157,9 +168,9 @@ describe('Buttons', () => {
   )
 
   it('start button sends POST request', async () => {
-    const mockPost = vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 })    
+    const mockPost = vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 })
     const wrapper = await mountWithPlayers('STOPPED', { post: mockPost })
-    
+
     const button = wrapper.findAll('.button-grid button').find(btn => btn.text() === 'start')!
 
     await button.trigger('click')
