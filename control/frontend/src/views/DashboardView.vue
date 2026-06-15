@@ -11,7 +11,7 @@
 
     <section class="button-grid">
       <button v-for="command in commands" :key="command" @click="sendCommand(command)"
-        :disabled="buttonsDisabled || (players === 'STOPPED' && command !== 'start')">
+        :disabled="isDisabled(command)">
         {{ command }}
       </button>
     </section>
@@ -68,6 +68,20 @@ async function sendCommand(command: string): Promise<void> {
     message.value = `Failed to send ${command}`
     buttonsDisabled.value = false // avoid having to reload on error
   }
+}
+
+function isDisabled(command: string): boolean {
+  if (buttonsDisabled.value) return true;
+
+  if (players.value === 'CHANGING' || players.value === 'UNKNOWN') {
+    return true;
+  }
+
+  if (players.value === 'STOPPED') {
+    return command !== 'start';
+  }
+
+  return command === 'start';
 }
 
 let intervalId: ReturnType<typeof setInterval>;

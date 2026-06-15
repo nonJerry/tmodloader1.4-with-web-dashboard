@@ -9,10 +9,10 @@ async function checkStatus() {
             throw new Error(`HTTP ${response.status}`)
         }
 
-        const text = await response.text()
+        const text = (await response.text()).trim()
 
-        if (text.trim() === 'STOPPED') {
-            currentStatus = 'STOPPED'
+        if (['STOPPED', 'CHANGING'].includes(text)) {
+            currentStatus = text
         } else {
             currentStatus = Number(text) ? text : '0'
         }
