@@ -27,7 +27,7 @@ services:
     build:
       context: ../control/frontend
       target: development
-    image: terraria/web-server:local
+    image: terraria-web-server:local
     restart: unless-stopped
     healthcheck:
       test: "wget --quiet --tries=1 --spider http://127.0.0.1:5173 || exit 1"
