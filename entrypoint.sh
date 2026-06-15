@@ -97,10 +97,13 @@ fi
 
 # Create the tmux and pipe, so we can inject commands from 'docker exec [container id] inject [command]' on the host
 sleep 5s
-tmux new-session -d "$server | tee $pipe"
+tmux new-session -s terraria -d "$server | tee -a $pipe" >/dev/null
+pid=$(tmux display-message -p -t terraria "#{pid}")
+echo "$pid" > /tmp/terraria.pid
 
 # Call the autosaver
 /terraria-server/autosave.sh &
+
 
 # Continue logging the Terraria Server and persist across server restarts.
 tail -F $pipe &

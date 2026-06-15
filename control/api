@@ -1,8 +1,10 @@
 #!/bin/sh
 pipe=/tmp/busy.pipe
+pidfile=/tmp/terraria.pid
+
 printf "Content-Type: text/plain\r\n\r\n"
 
-if [ ! "$(pgrep -f tmux)" ]; then
+if [ ! -f "$pidfile" ] || ! kill -0 "$(cat "$pidfile")" 2>/dev/null; then
     echo "Terraria server is not running" >> $pipe
     if [ "$PATH_INFO" != "/start" ]; then
         echo "STOPPED"
@@ -13,14 +15,28 @@ fi
 case "$REQUEST_METHOD" in
     GET)
         case "$PATH_INFO" in
-            /status)         
+            /status)
                 tmux send-keys "playing" Enter
 
                 sleep 1
 
-                tmux capture-pane -p \
-                    | tail -n 3 \
-                    | awk '/connected/{print $1}'
+		status=$(
+    			tmux capture-pane -p \
+		        | tail -n 3 \
+		        | awk '/connected/{print $1}'
+		)
+
+		case "$status" in
+			:)
+				echo "0"
+				;;
+    			*[!0-9]*|'')
+				echo "CHANGING"
+				;;
+			*)
+				echo "$status"
+				;;
+		esac
                 ;;
             *)
                 echo "Unknown GET endpoint"
@@ -36,6 +52,7 @@ case "$REQUEST_METHOD" in
                 tmux send-keys "say $TMOD_SHUTDOWN_MESSAGE" Enter
                 sleep 3
                 tmux send-keys "exit" Enter
+		sleep 5
                 kill $(pgrep -f autosave.sh)
                 echo "OK"
                 ;;
@@ -44,9 +61,12 @@ case "$REQUEST_METHOD" in
                 echo "Received command to start server" >> $pipe
 
                 cd /terraria-server
-                pgrep -f terraria-server >/dev/null || ./entrypoint.sh &
 
-                echo "Initiated server start" >> $pipe
+		if [ ! -f "$pidfile" ] || ! kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+			nohup ./entrypoint.sh >/dev/null 2>&1 &
+	                echo "Initiated server start" >> $pipe
+		fi
+
                 echo "OK"
                 ;;
 
