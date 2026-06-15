@@ -5,11 +5,11 @@ import { IS_PRODUCTION, SESSION_BOUND_TOKEN } from '../../config/constants.js';
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const accessToken = req.cookies?.accessToken;
+    const refreshToken = req.cookies?.refreshToken;
 
 
     try {
         if (!accessToken) {
-            const refreshToken = req.cookies?.refreshToken;
             if (refreshToken) {
                 throw new jwt.TokenExpiredError('Invalid or expired token', new Date());
             } else {
@@ -22,7 +22,6 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
         if (SESSION_BOUND_TOKEN && payload.sessionId !== req.session.id) {
             throw new jwt.JsonWebTokenError('Session invalid or expired');
         }
-        console.log(`Authentication successful for ${req.session.id}`);
         next()
     } catch (err) {
         if (err instanceof jwt.TokenExpiredError) {
@@ -35,8 +34,6 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     }
 
     function refreshAccessToken() {
-        const refreshToken = req.cookies?.refreshToken;
-
         if (!refreshToken) {
             return res.status(401).json({ error: 'Missing refresh token' });
         }
