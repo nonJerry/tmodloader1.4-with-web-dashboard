@@ -2,23 +2,29 @@
 import { describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import Dashboard from '@/views/DashboardView.vue'
-
 import { useApi } from '@/api/useAPI'
 
 
 vi.mock('@/api/useAPI', () => ({
   useApi: vi.fn<() => { get: () => Promise<StatusResponse>; post: () => Promise<object> }>(),
+  getCsrfToken: vi.fn<() => Promise<csrfResponse>>()
 }))
 
 type StatusResponse = { data: string }
+type csrfResponse = { data: { csrfToken: string } }
 const mockedUseApi = vi.mocked(useApi)
 
 
-async function mountWithPlayers(players: string) {
+
+async function mountWithPlayers(players: string, apiMocks: ApiMocks = {}) {
   const mockGet = vi.fn<() => Promise<StatusResponse>>().mockResolvedValue({
     data: players,
   })
-  mockedUseApi.mockReturnValue({ get: mockGet } as any)
+
+  const mockPost = apiMocks.post
+    ?? vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 })
+
+  mockedUseApi.mockReturnValue({ get: mockGet, post: mockPost } as any)
 
   const wrapper = mount(Dashboard)
   await flushPromises()
@@ -100,6 +106,16 @@ describe('Buttons', () => {
     })
   })
 
+  it('are enabled except start when server is running', async () => {
+    const wrapper = await mountWithPlayers('1')
+    const buttons = wrapper.findAll('button')
+
+    buttons.forEach((btn) => {
+      const label = btn.text()
+      expect(btn.element.disabled).toBe(label === 'start')
+    })
+  })
+
   it('are disabled immediately on click until next status update', async () => {
     const request = deferred<object>()
     const mockGet = vi.fn<() => Promise<StatusResponse>>().mockResolvedValue({ data: '1' })
@@ -109,18 +125,44 @@ describe('Buttons', () => {
     const wrapper = mount(Dashboard)
     await flushPromises()
 
-    const buttons = wrapper.findAll('button')
-    buttons.forEach(btn => expect(btn.element.disabled).toBe(false))
+    const buttons = wrapper.findAll('.button-grid button')
+    buttons.forEach(btn => expect((btn.element as HTMLButtonElement).disabled).toBe(btn.text() === 'start'))
 
-    const anyBtn = wrapper.find('button')
+    const anyBtn = buttons.find(btn => !(btn.element as HTMLButtonElement).disabled)!
     await anyBtn.trigger('click')
-    wrapper.findAll('button').forEach(btn => expect(btn.element.disabled).toBe(true))
+    wrapper.findAll('.button-grid button').forEach(btn => expect((btn.element as HTMLButtonElement).disabled).toBe(true))
 
     request.resolve({})
     await flushPromises()
 
     await (wrapper.vm as any).getStatus()
     await flushPromises()
-    wrapper.findAll('button').forEach(btn => expect(btn.element.disabled).toBe(false))
+    wrapper.findAll('.button-grid button').forEach(btn => expect((btn.element as HTMLButtonElement).disabled).toBe(btn.text() === 'start'))
+  })
+
+  it.each(['stop', 'dawn', 'noon', 'dusk', 'midnight', 'save',])(
+    '%s button sends POST request',
+    async (command) => {
+      const mockPost = vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 })
+      mockedUseApi.mockReturnValue({ post: mockPost } as any)
+
+      const wrapper = mount(Dashboard)
+      await flushPromises()
+
+      const button = wrapper.findAll('.button-grid button').find(btn => btn.text() === command)!
+
+      await button.trigger('click')
+      expect(mockPost).toHaveBeenCalled()
+    },
+  )
+
+  it('start button sends POST request', async () => {
+    const mockPost = vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 })    
+    const wrapper = await mountWithPlayers('STOPPED', { post: mockPost })
+    
+    const button = wrapper.findAll('.button-grid button').find(btn => btn.text() === 'start')!
+
+    await button.trigger('click')
+    expect(mockPost).toHaveBeenCalled()
   })
 })

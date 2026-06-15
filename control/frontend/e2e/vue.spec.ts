@@ -1,4 +1,4 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect, Page, Locator } from '@playwright/test'
 
 async function getStatus(page: Page, value: string) {
   await page.route('**/status', (route) => {
@@ -24,6 +24,15 @@ async function mockPost(page: Page) {
       route.continue()
     }
   })
+}
+
+async function expectThatAllExceptStartAreEnabled(buttons: Locator) {
+  const count = await buttons.count()
+  for (let i = 0; i < count; i++) {
+    const button = buttons.nth(i)
+    const label = (await button.textContent())?.trim()
+    await expect(button).toBeEnabled({ enabled: label === 'start' })
+  }
 }
 
 function expectLogin(page: Page) {
@@ -172,9 +181,7 @@ test.describe('Terraria Server Control page', () => {
     const buttons = page.locator('.button-grid').getByRole('button')
     const count = await buttons.count()
 
-    for (let i = 0; i < count; i++) {
-      await expect(buttons.nth(i)).toBeEnabled()
-    }
+    await expectThatAllExceptStartAreEnabled(buttons)
 
     const firstButton = buttons.first()
     await firstButton.click()
@@ -186,9 +193,7 @@ test.describe('Terraria Server Control page', () => {
     await getStatus(page, '1')
     await nextStatus(page)
 
-    for (let i = 0; i < count; i++) {
-      await expect(buttons.nth(i)).toBeEnabled()
-    }
+    await expectThatAllExceptStartAreEnabled(buttons)
   })
 })
 

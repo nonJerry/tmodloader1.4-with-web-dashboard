@@ -11,16 +11,34 @@ async function checkStatus() {
 
         const text = (await response.text()).trim()
 
-        if (['STOPPED', 'CHANGING'].includes(text)) {
-            currentStatus = text
-        } else {
-            currentStatus = Number(text) ? text : '0'
+        if (text === 'CHANGING') {
+
+            if (currentStatus === 'STARTING' || currentStatus === 'STOPPING') {
+                return
+            }
+
+            if (isNumber(currentStatus)) {
+                currentStatus = 'STOPPING';
+                return
+            }
+
+            // has to be starting from any other status
+            currentStatus = 'STARTING';
+            return 
         }
+
+        currentStatus = text
 
     } catch (err) {
         console.error('Status check failed:', err);
         currentStatus = 'UNKNOWN';
     }
+}
+
+function isNumber(value?: string | number): boolean {
+    return ((value != null) &&
+        (value !== '') &&
+        !Number.isNaN(Number(value.toString())));
 }
 
 export function getStatus() {
