@@ -27,7 +27,7 @@ services:
     build: 
       context: ./control/frontend
       target: production
-    image: terraria/web-server:local
+    image: terraria-web-server:local
     restart: unless-stopped
     healthcheck:
       test: "wget --quiet --tries=1 --spider http://127.0.0.1:8080 || exit 1"
@@ -48,7 +48,6 @@ services:
       context: ./control/backend
       target: production
     image: terraria-api:local
-    command: npm run start-watch
     working_dir: /code
     ports:
       - '8000:8000'
@@ -59,11 +58,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
     secrets:
       - users
-    volumes:
-      - ./control/backend/src:/code/src:Z,ro
-      - ./control/backend/package.json:/code/package.json:Z,ro
-      - ./control/backend/package-lock.json:/code/package-lock.json:Z,ro
-      - /code/node_modules
+#    volumes:
+#      - /code/node_modules
 
   redis:
     image: redis:alpine
