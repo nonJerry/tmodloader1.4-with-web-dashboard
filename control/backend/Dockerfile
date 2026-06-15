@@ -25,5 +25,5 @@ FROM dependencies AS production
 ARG NODE_ENV=production
 RUN npm prune --omit=dev
 COPY --from=build /code/dist /code
-CMD [ "node", "index.js" ]
+CMD [ "node", "src/index.js" ]
 EXPOSE 8000
