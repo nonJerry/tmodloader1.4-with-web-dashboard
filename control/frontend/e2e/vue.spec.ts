@@ -1,4 +1,4 @@
-import { test, expect, Page, Locator } from '@playwright/test'
+import { test, expect, Page, Locator, BrowserContext } from '@playwright/test'
 
 async function getStatus(page: Page, value: string) {
   await page.route('**/status', (route) => {
@@ -12,6 +12,21 @@ function initClock(page: Page) {
 
 function nextStatus(page: Page) {
   return page.clock.fastForward(5000)
+}
+
+async function makeCookieExpire(context: BrowserContext, cookieName: string) {
+  const cookie = (await context.cookies()).find(cookie => cookie.name === cookieName)
+  if (cookie) {
+    await context.addCookies([
+      {
+        name: cookie.name,
+        value: cookie.value,
+        domain: cookie.domain,
+        path: cookie.path,
+        expires: Math.floor(Date.now() / 1000) - 60,
+      },
+    ])
+  }
 }
 
 async function mockPost(page: Page) {
@@ -31,7 +46,7 @@ async function expectThatAllExceptStartAreEnabled(buttons: Locator) {
   for (let i = 0; i < count; i++) {
     const button = buttons.nth(i)
     const label = (await button.textContent())?.trim()
-    await expect(button).toBeEnabled({ enabled: label === 'start' })
+    await expect(button).toBeEnabled({ enabled: label !== 'start' })
   }
 }
 
@@ -153,7 +168,7 @@ test.describe('Terraria Server Control page', () => {
     await expect(playerCount).toHaveText('1')
 
     await getStatus(page, '4')
-    await nextStatus(page) // Get next status
+    await nextStatus(page)
     await expect(playerCount).toHaveText('4')
   })
 
@@ -183,8 +198,8 @@ test.describe('Terraria Server Control page', () => {
 
     await expectThatAllExceptStartAreEnabled(buttons)
 
-    const firstButton = buttons.first()
-    await firstButton.click()
+    const firstEnabledButton = page.locator('.button-grid').locator('button:enabled').first()
+    await firstEnabledButton.click()
 
     for (let i = 0; i < count; i++) {
       await expect(buttons.nth(i)).toBeDisabled()
@@ -198,9 +213,6 @@ test.describe('Terraria Server Control page', () => {
 })
 
 test.describe('Login', () => {
-
-
-
   test.beforeEach(async ({ page }) => {
     await page.goto('/login')
   })
@@ -209,7 +221,6 @@ test.describe('Login', () => {
     page.goto('/')
     await expectLogin(page)
   })
-
 
 
   test('requires username and password', async ({ page }) => {
@@ -226,24 +237,15 @@ test.describe('Login', () => {
     await expectDashboard(page)
   })
 
-  test('is required after refreshToken expired', async ({ page, context }) => {
+  test('is required after refreshToken and accessToken expired', async ({ page, context }) => {
     await initClock(page)
     await page.goto('/')
     await loginAs(page, 'alice', 'alicePassword')
     await expectDashboard(page)
 
-    const refreshCookie = (await context.cookies()).find(cookie => cookie.name === 'refreshToken')
-    await context.addCookies([
-      {
-        name: 'accessToken',
-        value: refreshCookie!.value,
-        domain: refreshCookie!.domain,
-        path: refreshCookie!.path,
-        expires: Math.floor(Date.now() / 1000) - 60,
-      },
-    ])
-    
-    await page.goto('/')
+    await makeCookieExpire(context, 'accessToken')
+    await makeCookieExpire(context, 'refreshToken')
+   
     await nextStatus(page)
     await expectLogin(page)
   })
@@ -254,16 +256,7 @@ test.describe('Login', () => {
     await loginAs(page, 'alice', 'alicePassword')
     await expectDashboard(page)
 
-    const accessCookie = (await context.cookies()).find(cookie => cookie.name === 'accessToken')
-    await context.addCookies([
-      {
-        name: 'accessToken',
-        value: accessCookie!.value,
-        domain: accessCookie!.domain,
-        path: accessCookie!.path,
-        expires: Math.floor(Date.now() / 1000) - 60,
-      },
-    ])
+    await makeCookieExpire(context, 'accessToken')
 
     await page.goto('/')
     await expectDashboard(page)
