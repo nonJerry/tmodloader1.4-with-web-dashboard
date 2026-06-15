@@ -50,7 +50,6 @@ services:
         - NODE_ENV=development
       context: ../control/backend
       target: development
-    command: npm run start-watch
     ports:
       - '8000:8000'
     env_file:
@@ -59,6 +58,8 @@ services:
       NODE_ENV: development
       JWT_SECRET: ${JWT_SECRET}
       ALLOWED_ORIGINS: http://localhost:5173
+      CHOKIDAR_USEPOLLING: true
+      CHOKIDAR_INTERVAL: 100
     secrets:
       - users
     volumes:
