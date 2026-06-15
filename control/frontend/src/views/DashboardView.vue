@@ -10,8 +10,7 @@
     </section>
 
     <section class="button-grid">
-      <button v-for="command in commands" :key="command" @click="sendCommand(command)"
-        :disabled="isDisabled(command)">
+      <button v-for="command in commands" :key="command" @click="sendCommand(command)" :disabled="isDisabled(command)">
         {{ command }}
       </button>
     </section>
@@ -73,15 +72,21 @@ async function sendCommand(command: string): Promise<void> {
 function isDisabled(command: string): boolean {
   if (buttonsDisabled.value) return true;
 
-  if (players.value === 'CHANGING' || players.value === 'UNKNOWN') {
-    return true;
-  }
-
   if (players.value === 'STOPPED') {
     return command !== 'start';
   }
 
-  return command === 'start';
+  if (isNumber(players.value)) {
+    return command === 'start';;
+  }
+
+  return true;
+}
+
+function isNumber(value?: string | number): boolean {
+  return ((value != null) &&
+    (value !== '') &&
+    !Number.isNaN(Number(value.toString())));
 }
 
 let intervalId: ReturnType<typeof setInterval>;
