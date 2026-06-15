@@ -6,12 +6,17 @@ import { IS_PRODUCTION, SESSION_BOUND_TOKEN } from '../../config/constants.js';
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const accessToken = req.cookies?.accessToken;
 
-    if (!accessToken) {
-        console.log('No access token cookie found');
-        return res.status(401).json({ error: 'Missing access token cookie' });
-    }
 
     try {
+        if (!accessToken) {
+            const refreshToken = req.cookies?.refreshToken;
+            if (refreshToken) {
+                throw new jwt.TokenExpiredError('Invalid or expired token', new Date());
+            } else {
+                console.log('No access token cookie found');
+                return res.status(401).json({ error: 'Missing access token cookie' });
+            }
+        }
         const payload = verifyToken(accessToken);
 
         if (SESSION_BOUND_TOKEN && payload.sessionId !== req.session.id) {
