@@ -4,7 +4,6 @@ import router from '@/router'
 
 /**
  * Middleware - if user lost authentication (401) it gets kicked out
- * FROM https://youtu.be/BWNcuB3LQz8?t=1119
  */
 const middleware401 = async (error: AxiosError): Promise<never> => {
     const status = error.response?.status
@@ -19,7 +18,7 @@ const middleware401 = async (error: AxiosError): Promise<never> => {
     } else if (status === 403) {
         const rejectionError = new Error('You are not authorized to access this resource.')
         rejectionError.name = 'PermissionDenied'
-         await authStore.initializeCsrfToken()
+        await authStore.initializeCsrfToken()
         throw rejectionError;
     }
 
