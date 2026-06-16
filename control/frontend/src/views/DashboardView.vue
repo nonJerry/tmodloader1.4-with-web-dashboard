@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { useApi } from '@/api/useAPI'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const api = useApi('api')
 const players = ref<string>('0')
@@ -44,11 +44,10 @@ const commands = [
 async function getStatus(): Promise<void> {
   try {
     const response = await api.get('/status', { responseType: "text" })
-    const text = response.data
-    players.value = text.trim()
+    players.value = response.data.trim()
   } catch (error) {
     console.log(error)
-    players.value = '0'
+    players.value = 'UNKNOWN'
   } finally {
     buttonsDisabled.value = false // buttons only disabled if server is stopped
   }
@@ -70,25 +69,27 @@ async function sendCommand(command: string): Promise<void> {
   }
 }
 
-function isDisabled(command: string): boolean {
-  if (buttonsDisabled.value) return true;
+const isDisabled = computed(() => {
+  return (command: string) => {
+    if (buttonsDisabled.value) return true;
 
-  if (players.value === 'STOPPED') {
-    return command !== 'start';
+    if (players.value === 'STOPPED') {
+      return command !== 'start';
+    }
+
+    if (isNumber(players.value)) {
+      return command === 'start';;
+    }
+
+    return true;
   }
-
-  if (isNumber(players.value)) {
-    return command === 'start';;
-  }
-
-  return true;
-}
+})
 
 function isNumber(value?: string | number): boolean {
-  return ((value != null) &&
-    (value !== '') &&
-    !Number.isNaN(Number(value.toString())));
-}
+    return ((value != null) &&
+      (value !== '') &&
+      !Number.isNaN(Number(value.toString())));
+  }
 
 let intervalId: ReturnType<typeof setInterval>;
 
