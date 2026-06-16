@@ -4,65 +4,78 @@ import bcrypt from 'bcrypt'
 import users from '../../services/users.service.js'
 import { createAccessToken, createToken } from '../../services/jwt.service.js'
 
-export async function handleLogin (req: Request, res: Response) {
-        const { username, password } = req.body
 
-        if (!username || !password) {
-            return res.status(400).json({ error: 'username and password required' })
-        }
+const refreshTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-refreshToken` : 'refreshToken'
+const accessTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-accessToken` : 'accessToken'
+const xsrfTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-xsrf-token` : 'xsrf-token'
+const sessionIdCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-sessionId` : 'sessionId'
 
-        const hashedPassword = users[username]
-        if (!hashedPassword) {
-            return res.status(401).json({ error: 'Invalid user' })
-        }
+export async function handleLogin(req: Request, res: Response) {
+    const { username, password } = req.body
 
-        const valid = await bcrypt.compare(password, hashedPassword)
-        if (!valid) {
-            return res.status(401).json({ error: 'Invalid password' })
-        }
+    if (!username || !password) {
+        return res.status(400).json({ error: 'username and password required' })
+    }
 
-        const jwtToken = createToken(username)
-        const shortLivedJwtToken = createAccessToken(jwtToken, req.session.id)
+    const hashedPassword = users[username]
+    if (!await isValidPassword(password, hashedPassword)) {
+        return res.status(401).json({ error: 'Invalid username or password' })
+    }
 
-        res.cookie(COOKIE_PREFIX + "-refreshToken", jwtToken, {
-            httpOnly: true,
-            secure: IS_PRODUCTION,
-            sameSite: "lax",
-            path: "/",
-            maxAge: 1000 * 60 * 60 * 24 * 365
-        })
+    const refreshToken = createToken(username)
+    const accessToken = createAccessToken(refreshToken, req.session.id)
 
-        res.cookie(COOKIE_PREFIX + "-accessToken", shortLivedJwtToken, {
-            httpOnly: true,
-            secure: IS_PRODUCTION,
-            sameSite: "lax",
-            path: "/",
-        })
+    setLoginCookies(res, refreshToken, accessToken)
 
-
-        res.json({ success: true, message: "Login successful" })
+    return res.json({ success: true, message: 'Login successful' })
 }
 
-export function handleLogout (req: Request, res: Response) {
-        const removeCookie = (cookieName: string) => {
-            res.clearCookie(cookieName, {
-                httpOnly: true,
-                secure: IS_PRODUCTION,
-                sameSite: "lax",
-                path: "/",
-            })
+export function handleLogout(req: Request, res: Response) {
+    clearCookie(res, refreshTokenCookie)
+    clearCookie(res, accessTokenCookie)
+    clearCookie(res, xsrfTokenCookie)
+
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err)
+            return res.status(500).send('Logout failed')
         }
 
-        removeCookie(IS_PRODUCTION ? COOKIE_PREFIX + "-accessToken" : "accessToken");
-        removeCookie(IS_PRODUCTION ? COOKIE_PREFIX + "-xsrf-token" : "xsrf-token");
+        clearCookie(res, sessionIdCookie)
+        return res.json({ success: true, message: 'Logged out successfully' })
+    })
+}
 
-        req.session.destroy((err) => {
-            if (err) {
-                console.error('Error destroying session:', err);
-                return res.status(500).send('Logout failed');
-            }
-            removeCookie(IS_PRODUCTION ? COOKIE_PREFIX + "-sessionId" : "sessionId");
+async function isValidPassword(password: string, hashedPassword?: string) {
+    if (!hashedPassword) {
+        return false
+    }
 
-            res.json({ success: true, message: "Logged out successfully" })
-        })
+    return bcrypt.compare(password, hashedPassword)
+}
+
+function setLoginCookies(res: Response, refreshToken: string, accessToken: string) {
+    res.cookie(refreshTokenCookie, refreshToken, {
+        httpOnly: true,
+        secure: IS_PRODUCTION,
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+    })
+
+    res.cookie(accessTokenCookie, accessToken, {
+        httpOnly: true,
+        secure: IS_PRODUCTION,
+        sameSite: 'lax',
+        path: '/',
+    })
+}
+
+function clearCookie(res: Response, cookieName: string) {
+    res.clearCookie(cookieName, {
+        httpOnly: true,
+        secure: IS_PRODUCTION,
+        sameSite: 'lax',
+        path: '/',
+    })
 }

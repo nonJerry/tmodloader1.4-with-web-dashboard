@@ -1,55 +1,62 @@
 import { Request, Response, NextFunction } from 'express';
-import { createAccessToken, verifyToken } from '../../services/jwt.service.js';
-import jwt from 'jsonwebtoken';
-import { IS_PRODUCTION, SESSION_BOUND_TOKEN } from '../../config/constants.js';
+import { COOKIE_PREFIX, IS_PRODUCTION } from '../../config/constants.js';
+import { authenticateAccessToken, refreshAccessToken, isTokenExpiredError } from '../../services/auth.service.js'
+
+const accessTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-accessToken` : 'accessToken'
+const refreshTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-refreshToken` : 'refreshToken'
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
-    const accessToken = req.cookies?.accessToken;
-    const refreshToken = req.cookies?.refreshToken;
+    const accessToken = req.cookies?.[accessTokenCookie]
+    const refreshToken = req.cookies?.[refreshTokenCookie]
+    const sessionId = req.session?.id
 
+    if (!sessionId) {
+        return unauthorized(res, 'Session required')
+    }
+
+    if (!accessToken) {
+        const newAccessToken = getNewAccessToken(refreshToken, sessionId)
+        if (!newAccessToken) return unauthorized(res, 'Missing or invalid refresh token')
+        setAccessTokenCookie(res, newAccessToken)
+        return next()
+    }
 
     try {
-        if (!accessToken) {
-            if (refreshToken) {
-                throw new jwt.TokenExpiredError('Invalid or expired token', new Date());
-            } else {
-                console.log('No access token cookie found');
-                return res.status(401).json({ error: 'Missing access token cookie' });
-            }
+        authenticateAccessToken(accessToken, sessionId)
+        return next()
+    } catch (error) {
+        if (!isTokenExpiredError(error)) {
+            console.error('Authentication failed:', error)
+            return unauthorized(res, 'Invalid or expired token')
         }
-        const payload = verifyToken(accessToken);
 
-        if (SESSION_BOUND_TOKEN && payload.sessionId !== req.session.id) {
-            throw new jwt.JsonWebTokenError('Session invalid or expired');
-        }
-        next()
-    } catch (err) {
-        if (err instanceof jwt.TokenExpiredError) {
-            console.log(`Token expired for ${req.session.id}, trying to refresh`);
-            refreshAccessToken()
-        } else {
-            console.log(`Failed authentication for ${req.session.id}: ${err}`)
-            return res.status(401).json({ error: 'Invalid or expired token' })
-        }
+        const newAccessToken = getNewAccessToken(refreshToken, sessionId)
+        if (!newAccessToken) return unauthorized(res, 'Missing or invalid refresh token')
+        setAccessTokenCookie(res, newAccessToken)
+        return next()
     }
+}
 
-    function refreshAccessToken() {
-        if (!refreshToken) {
-            return res.status(401).json({ error: 'Missing refresh token' });
-        }
+function getNewAccessToken(refreshToken: string | undefined, sessionId: string) {
+    if (!refreshToken) return undefined
 
-        try {
-            const newAccessToken = createAccessToken(refreshToken, req.session.id);
-            res.cookie("accessToken", newAccessToken, {
-                httpOnly: true,
-                secure: IS_PRODUCTION,
-                sameSite: "lax",
-                path: "/",
-            })
-            console.log(`Access token refreshed successfully for ${req.session.id}`);
-            next();
-        } catch (ignoredError) {
-            return res.status(401).json({ error: 'Invalid or expired token' });
-        }
+    try {
+        return refreshAccessToken(refreshToken, sessionId)
+    } catch (error) {
+        console.error('Refresh token failed:', error)
+        return undefined
     }
+}
+
+function setAccessTokenCookie(res: Response, token: string) {
+    res.cookie(accessTokenCookie, token, {
+        httpOnly: true,
+        secure: IS_PRODUCTION,
+        sameSite: 'lax',
+        path: '/',
+    })
+}
+
+function unauthorized(res: Response, message: string) {
+    return res.status(401).json({ error: message })
 }

@@ -1,7 +1,7 @@
 import { RedisStore } from "connect-redis";
 import expressSession from "express-session";
 import { createClient } from 'redis';
-import { IS_PRODUCTION, REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD, SESSION_SECRET, COOKIE_PREFIX, COOKIE_PREFIX } from "./constants.js";
+import { IS_PRODUCTION, REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD, SESSION_SECRET, COOKIE_PREFIX } from "./constants.js";
 import { RequestHandler } from "express";
 
 

@@ -46,7 +46,7 @@ function advanceTime(amount: number) {
 
 export function handleSetTimeout(req: Request, res: Response) {
         try {
-            setTimeout(req.body.timeout)
+            setInactivityTimeout(req.body.timeout)
             res.status(200).json({
                 success: true,
                 message: `Inactivity timeout set to ${req.body.timeout} ms`,
@@ -59,10 +59,6 @@ export function handleSetTimeout(req: Request, res: Response) {
                 message: `Failed to set inactivity timeout`,
             });
         }
-}
-
-function setTimeout(timeout: number) {
-    setInactivityTimeout(timeout)
 }
 
 export function handleReset(req: Request, res: Response)  {
