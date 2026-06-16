@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { IS_PRODUCTION } from "../../config/constants.js"
+import { COOKIE_PREFIX, IS_PRODUCTION } from "../../config/constants.js"
 import bcrypt from 'bcrypt'
 import users from '../../services/users.service.js'
 import { createAccessToken, createToken } from '../../services/jwt.service.js'
@@ -24,7 +24,7 @@ export async function handleLogin (req: Request, res: Response) {
         const jwtToken = createToken(username)
         const shortLivedJwtToken = createAccessToken(jwtToken, req.session.id)
 
-        res.cookie("refreshToken", jwtToken, {
+        res.cookie(COOKIE_PREFIX + "-refreshToken", jwtToken, {
             httpOnly: true,
             secure: IS_PRODUCTION,
             sameSite: "lax",
@@ -32,7 +32,7 @@ export async function handleLogin (req: Request, res: Response) {
             maxAge: 1000 * 60 * 60 * 24 * 365
         })
 
-        res.cookie("accessToken", shortLivedJwtToken, {
+        res.cookie(COOKIE_PREFIX + "-accessToken", shortLivedJwtToken, {
             httpOnly: true,
             secure: IS_PRODUCTION,
             sameSite: "lax",
@@ -53,15 +53,15 @@ export function handleLogout (req: Request, res: Response) {
             })
         }
 
-        removeCookie("accessToken");
-        removeCookie("xsrf-token");
+        removeCookie(IS_PRODUCTION ? COOKIE_PREFIX + "-accessToken" : "accessToken");
+        removeCookie(IS_PRODUCTION ? COOKIE_PREFIX + "-xsrf-token" : "xsrf-token");
 
         req.session.destroy((err) => {
             if (err) {
                 console.error('Error destroying session:', err);
                 return res.status(500).send('Logout failed');
             }
-            removeCookie('connect.sid');
+            removeCookie(IS_PRODUCTION ? COOKIE_PREFIX + "-sessionId" : "sessionId");
 
             res.json({ success: true, message: "Logged out successfully" })
         })

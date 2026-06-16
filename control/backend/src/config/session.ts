@@ -1,7 +1,7 @@
 import { RedisStore } from "connect-redis";
 import expressSession from "express-session";
 import { createClient } from 'redis';
-import { IS_PRODUCTION, REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD, SESSION_SECRET } from "./constants.js";
+import { IS_PRODUCTION, REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD, SESSION_SECRET, COOKIE_PREFIX, COOKIE_PREFIX } from "./constants.js";
 import { RequestHandler } from "express";
 
 
@@ -13,13 +13,13 @@ if (IS_PRODUCTION || REDIS_USER) {
     username: REDIS_USER,
     password: REDIS_PASSWORD,
     socket: {
-        host: REDIS_HOST,
-        port: REDIS_PORT
+      host: REDIS_HOST,
+      port: REDIS_PORT
     }
   });
   redis.on('connect', () => {
     console.log('Connected to Redis');
-  });  
+  });
   redis.on('error', err => console.log('Redis Client Error', err));
 
   await redis.connect();
@@ -35,6 +35,7 @@ if (IS_PRODUCTION || REDIS_USER) {
     rolling: true,
     // maxAge is 1 hour in ms
     cookie: { secure: IS_PRODUCTION, sameSite: "lax", signed: true, maxAge: 3.6e6 },
+    name: IS_PRODUCTION ? `${COOKIE_PREFIX}-sessionId` : 'connect.sid',
     store: redisStore,
   })
 } else {
