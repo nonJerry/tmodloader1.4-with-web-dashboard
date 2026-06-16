@@ -57,6 +57,13 @@ describe('Dashboard', () => {
 
   })
 
+  it('shows no "Players online" when server is stopped', async () => {
+    const wrapper = await mountWithPlayers('STOPPED')
+
+    expect(wrapper.find('.status-card').text()).not.toContain('Players online')
+
+  })
+
   it.each(['0', '1', '10', '100'])(
     'shows %s players online',
     async (players) => {
