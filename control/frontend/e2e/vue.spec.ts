@@ -77,61 +77,98 @@ async function loginAs(page: Page, username: string, password: string) {
   await page.getByRole('button', { name: 'Mystery Function' }).click()
 }
 
+async function ensureServerIsOnline(page: Page, maxRetries = 2) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const status = (await page.locator('.player-count').textContent())?.trim()
+
+    if (status === '0') {
+      return
+    }
+
+    const startButton = page.locator('.button-grid').getByRole('button', { name: 'start' })
+    const btn = (await startButton.count()) ? startButton : page.locator('button', { hasText: 'start' })
+    await btn.click()
+    await btn.click() // twice to avoid problems with csrf
+
+    try {
+      await page.waitForFunction(
+        (selector) => {
+          const el = document.querySelector(selector)
+          return !!el && el.textContent?.trim() === '0'
+        },
+        '.player-count',
+        { timeout: 20000 }
+      )
+
+      return
+    } catch {
+      if (attempt > maxRetries) throw new Error('Failed to ensure server is running')
+      await page.waitForTimeout(500)
+    }
+  }
+}
+
+async function setupLoginState(context: BrowserContext) {
+  await context.setStorageState({
+    cookies: [],
+    origins: [
+      {
+        origin: 'http://localhost:5173',
+        localStorage: [
+          {
+            name: 'AUTH_STATE',
+            value: JSON.stringify({ username: 'alice', isLoggedIn: true })
+          },
+          {
+            name: 'USER_INFO',
+            value: JSON.stringify({ username: 'alice' })
+          }
+        ]
+      }
+    ]
+  }
+  )
+
+  await context.addCookies([
+    {
+      name: 'refreshToken',
+      value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwiaWF0IjoxNzgxMjI2MDQ5LCJleHAiOjE4MTI3ODM2NDksImF1ZCI6ImNoYWxsZW5nZXJzIiwiaXNzIjoidGVycmFyaWEtY29udHJvbCJ9.mONz0rwxTckGt2RgpDW0jbjXWj6uavSH8eQJ1ls-AWA',
+      url: 'http://localhost:5173',
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Lax',
+      expires: 1812762951.984077,
+    },
+    {
+      name: 'accessToken',
+      value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwic2Vzc2lvbklkIjoicV9UMTd4VmJXdDEwWkp1WFlXS1RqcGI1cVhHbFctdHYiLCJpYXQiOjE3ODEyMjYwNDksImV4cCI6MTc4MTIyNjEwOSwiYXVkIjoiY2hhbGxlbmdlcnMiLCJpc3MiOiJ0ZXJyYXJpYS1jb250cm9sIn0.zG-ggMYMUWSWoaDBhUDtG0B0ucpAmxA9KwslSVdr2-o',
+      url: 'http://localhost:5173',
+      httpOnly: true,
+      secure: false,
+      sameSite: 'Lax',
+      expires: undefined,
+    },
+    {
+      name: 'xsrf-token',
+      value: 'e6cab63a438f71951fd7a9c3740bb2dd9e3487d455da09eff4a7ea936ad58b22.54bb340541b471ab1d409f0f0ed0d1d2a8218845085e070d673c6322d49406ce',
+      url: 'http://localhost:5173',
+      httpOnly: false,
+      secure: false,
+      sameSite: 'Lax',
+      expires: undefined,
+    },
+  ])
+}
+
 test.describe('Terraria Server Control page', () => {
 
   test.beforeEach(async ({ page, context }) => {
 
-    await context.setStorageState({
-      cookies: [],
-      origins: [
-        {
-          origin: 'http://localhost:5173',
-          localStorage: [
-            {
-              name: 'AUTH_STATE',
-              value: JSON.stringify({ username: 'alice', isLoggedIn: true })
-            },
-            {
-              name: 'USER_INFO',
-              value: JSON.stringify({ username: 'alice' })
-            }
-          ]
-        }
-      ]
-    }
-    )
-
-    await context.addCookies([
-      {
-        name: 'refreshToken',
-        value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwiaWF0IjoxNzgxMjI2MDQ5LCJleHAiOjE4MTI3ODM2NDksImF1ZCI6ImNoYWxsZW5nZXJzIiwiaXNzIjoidGVycmFyaWEtY29udHJvbCJ9.mONz0rwxTckGt2RgpDW0jbjXWj6uavSH8eQJ1ls-AWA',
-        url: 'http://localhost:5173',
-        httpOnly: true,
-        secure: false,
-        sameSite: 'Lax',
-        expires: 1812762951.984077,
-      },
-      {
-        name: 'accessToken',
-        value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwic2Vzc2lvbklkIjoicV9UMTd4VmJXdDEwWkp1WFlXS1RqcGI1cVhHbFctdHYiLCJpYXQiOjE3ODEyMjYwNDksImV4cCI6MTc4MTIyNjEwOSwiYXVkIjoiY2hhbGxlbmdlcnMiLCJpc3MiOiJ0ZXJyYXJpYS1jb250cm9sIn0.zG-ggMYMUWSWoaDBhUDtG0B0ucpAmxA9KwslSVdr2-o',
-        url: 'http://localhost:5173',
-        httpOnly: true,
-        secure: false,
-        sameSite: 'Lax',
-        expires: undefined,
-      },
-      {
-        name: 'xsrf-token',
-        value: 'e6cab63a438f71951fd7a9c3740bb2dd9e3487d455da09eff4a7ea936ad58b22.54bb340541b471ab1d409f0f0ed0d1d2a8218845085e070d673c6322d49406ce',
-        url: 'http://localhost:5173',
-        httpOnly: false,
-        secure: false,
-        sameSite: 'Lax',
-        expires: undefined,
-      },
-    ])
+    await setupLoginState(context)
 
     await page.goto('/')
+
+    await ensureServerIsOnline(page)
 
   });
 
@@ -225,11 +262,11 @@ test.describe('Login', () => {
 
   test('requires username and password', async ({ page }) => {
 
-    await page.getByRole('button', { name: 'Mystery Function' }).click()
+    await page.getByRole('button', { name: 'Mystery Function' }).click({ force: true })
     await expectLogin(page)
 
     await page.getByRole('textbox', { name: 'What may go here?' }).fill('alice')
-    await page.getByRole('button', { name: 'Mystery Function' }).click()
+    await page.getByRole('button', { name: 'Mystery Function' }).click({ force: true })
     await expectLogin(page)
 
 
@@ -245,7 +282,7 @@ test.describe('Login', () => {
 
     await makeCookieExpire(context, 'accessToken')
     await makeCookieExpire(context, 'refreshToken')
-   
+
     await nextStatus(page)
     await expectLogin(page)
   })
@@ -260,6 +297,36 @@ test.describe('Login', () => {
 
     await page.goto('/')
     await expectDashboard(page)
+  })
+
+})
+
+test.describe('Server', () => {
+
+  test.beforeEach(async ({ page, context }) => {
+
+    await setupLoginState(context)
+
+    await page.goto('/')
+
+    await ensureServerIsOnline(page)
+
+  });
+
+  test('is stopped if nobody is logged in for 10 minutes by default', async ({ page }) => {
+    await initClock(page)
+    await page.goto('/')
+    await expectDashboard(page)
+
+    await page.request.post('http://localhost:8000/test/advance-time', {
+      data: { amount: 10 * 60 * 1000 }
+    });
+
+    await page.waitForTimeout(5000); // ensure backend has polled at least once
+    await nextStatus(page)
+    const playerCount = page.locator('.player-count')
+    await expect(playerCount).not.toHaveText('0')
+    await expect(playerCount).toHaveText(/STOPPING|STOPPED/)
   })
 
 })

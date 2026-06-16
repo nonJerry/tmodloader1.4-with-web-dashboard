@@ -3,6 +3,9 @@ import { API_URL } from "../config/constants.js";
 
 let currentStatus = '0';
 let lastPlayerSeen = Date.now()
+const POLLING_INTERVAL = 5000
+const DEFAULT_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+let INACTIVITY_TIMEOUT = DEFAULT_TIMEOUT;
 
 async function checkStatus() {
     try {
@@ -32,7 +35,7 @@ async function checkStatus() {
 
         if (isNumber(text)) {
             if (text === '0') {
-                if (lastPlayerSeen < Date.now() - (10 * 60 * 1000)) {
+                if (lastPlayerSeen < Date.now() - INACTIVITY_TIMEOUT) {
                     console.log('Stopping server because of inactivity')
                     await sendCommand('stop')
                 }
@@ -55,8 +58,35 @@ function isNumber(value?: string | number): boolean {
         !Number.isNaN(Number(value.toString())));
 }
 
+/**
+ * 
+ * @param timeout Timeout in ms
+ */
+export function setInactivityTimeout(timeout: number) {
+    INACTIVITY_TIMEOUT = timeout;
+    console.log(`Inactivity timeout updated to: ${timeout}`)
+}
+
+export function getInactivityTimeout() {
+    return INACTIVITY_TIMEOUT;
+}
+
+export function getDefaultTimeout() {
+    return DEFAULT_TIMEOUT;
+}
+
+export function setLastSeen(timestamp: number) {
+    lastPlayerSeen = timestamp;
+    console.log(`Last seen updated to: ${timestamp}`)
+}
+
+export function getLastSeen() {
+    return lastPlayerSeen;
+}
+
 export function extendAllowedInactivity() {
     lastPlayerSeen = Date.now();
+    console.log(`Inactivity extended to: ${lastPlayerSeen}`)
 }
 
 export function getStatus() {
@@ -65,5 +95,5 @@ export function getStatus() {
 
 export function startStatusPolling() {
     checkStatus();
-    setInterval(checkStatus, 5000);
+    setInterval(checkStatus, POLLING_INTERVAL);
 }

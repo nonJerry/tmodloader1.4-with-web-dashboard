@@ -12,6 +12,7 @@ import userRouter from './api/routes/users.route.js';
 import authRouter from './api/routes/auth.routes.js'
 import session from './config/session.js';
 import { startStatusPolling } from './services/status.service.js';
+import testRouter from './api/routes/test.routes.js';
 
 
 console.log(`Running in production: ${IS_PRODUCTION}`)
@@ -41,6 +42,12 @@ app.get("/csrf-token", (req, res) => {
 
 
 app.use('/', authRouter)
+
+if (!IS_PRODUCTION) {
+    console.log('!!!USING TEST ROUTES!!!')
+    app.use('/test', testRouter);
+}
+
 app.use(doubleCsrfProtection);
 app.use('/api', statusRouter)
 app.use('/api', userRouter)
