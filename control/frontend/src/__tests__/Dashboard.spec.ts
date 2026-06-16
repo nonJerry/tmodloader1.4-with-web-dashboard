@@ -151,7 +151,7 @@ describe('Buttons', () => {
     wrapper.findAll('.button-grid button').forEach(btn => expect((btn.element as HTMLButtonElement).disabled).toBe(btn.text() === 'start'))
   })
 
-  it.each(['stop', 'dawn', 'noon', 'dusk', 'midnight', 'save',])(
+  it.each(['stop', 'dawn', 'noon', 'dusk', 'midnight', 'save', 'extend'])(
     '%s button sends POST request',
     async (command) => {
       const mockPost = vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 })

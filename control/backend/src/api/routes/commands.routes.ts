@@ -1,6 +1,6 @@
 import express from 'express'
 import { authMiddleware } from "../middlewares/auth.middleware.js";
-import handleCommand from '../controllers/commands.controller.js'
+import { handleCommand } from '../controllers/commands.controller.js'
 
 
 const commandsRouter = express.Router();

@@ -38,6 +38,7 @@ const commands = [
   'dusk',
   'midnight',
   'save',
+  'extend'
 ]
 
 async function getStatus(): Promise<void> {
