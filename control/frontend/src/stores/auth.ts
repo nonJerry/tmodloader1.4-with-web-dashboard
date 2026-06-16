@@ -22,6 +22,7 @@ export const useAuthStore = defineStore('auth', {
         async initAuth() {
             await useApi('api').get('/me').then(() => {
                 this.updateState({ isLoggedIn: true })
+                this.initializeCsrfToken()
             }).catch(() => {
                 // Not logged in
             })

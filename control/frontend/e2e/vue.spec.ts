@@ -102,7 +102,6 @@ async function ensureServerIsOnline(page: Page, maxRetries = 2) {
 
     const startButton = page.locator('.button-grid').getByRole('button', { name: 'start' }).first()
     await startButton.click()
-    await startButton.click() // twice to avoid problems with csrf
 
     try {
       await page.waitForFunction(
@@ -276,11 +275,16 @@ test.describe('Login', () => {
 
   test('requires username and password', async ({ page }) => {
 
-    await page.getByRole('button', { name: 'Mystery Function' }).click({ force: true })
+    const loginButton = page.getByRole('button', { name: 'Mystery Function' })
+
+    await expect(loginButton).toBeVisible()
+    await expect(loginButton).toBeEnabled()
+
+    await loginButton.click({ force: true })
     await expectLogin(page)
 
     await page.getByRole('textbox', { name: 'What may go here?' }).fill('alice')
-    await page.getByRole('button', { name: 'Mystery Function' }).click({ force: true })
+    await loginButton.click({ force: true })
     await expectLogin(page)
 
 
@@ -339,11 +343,11 @@ test.describe('Server', () => {
     await page.request.post('http://localhost:8000/test/advance-time', {
       data: { amount: 10 * 60 * 1000 }
     });
-    
+
     await page.waitForTimeout(10000); // ensure backend has polled at least once and server had time to shutdown
     await nextStatus(page)
     const playerCount = page.locator('.player-count')
     await expect(playerCount).toHaveText(/STOPPING|STOPPED/)
   })
-  
+
 })
