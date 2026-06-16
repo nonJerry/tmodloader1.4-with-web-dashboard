@@ -85,10 +85,24 @@ async function ensureServerIsOnline(page: Page, maxRetries = 2) {
       return
     }
 
-    const startButton = page.locator('.button-grid').getByRole('button', { name: 'start' })
-    const btn = (await startButton.count()) ? startButton : page.locator('button', { hasText: 'start' })
-    await btn.click()
-    await btn.click() // twice to avoid problems with csrf
+    if (status !== 'STOPPED') {
+      await page.waitForFunction(
+        (selector) => {
+          const el = document.querySelector(selector)
+          const text = el?.textContent?.trim()
+          return !!el && (text === '0' || text === 'STOPPED')
+        },
+        '.player-count',
+        { timeout: 40000 }
+      )
+      if ((await page.locator('.player-count').textContent())?.trim() === '0') {
+        return
+      }
+    }
+
+    const startButton = page.locator('.button-grid').getByRole('button', { name: 'start' }).first()
+    await startButton.click()
+    await startButton.click() // twice to avoid problems with csrf
 
     try {
       await page.waitForFunction(
@@ -255,7 +269,7 @@ test.describe('Login', () => {
   })
 
   test('is shown instead of main page when user is not logged in', async ({ page }) => {
-    page.goto('/')
+    await page.goto('/')
     await expectLogin(page)
   })
 
@@ -306,14 +320,18 @@ test.describe('Server', () => {
   test.beforeEach(async ({ page, context }) => {
 
     await setupLoginState(context)
-
     await page.goto('/')
-
     await ensureServerIsOnline(page)
 
   });
 
-  test('is stopped if nobody is logged in for 10 minutes by default', async ({ page }) => {
+  test.afterEach(async ({ page }) => {
+    await ensureServerIsOnline(page)
+  })
+
+  test('is stopped if nobody is logged in for 10 minutes by default', {
+    tag: '@destructive',
+  }, async ({ page }) => {
     await initClock(page)
     await page.goto('/')
     await expectDashboard(page)
@@ -321,12 +339,11 @@ test.describe('Server', () => {
     await page.request.post('http://localhost:8000/test/advance-time', {
       data: { amount: 10 * 60 * 1000 }
     });
-
-    await page.waitForTimeout(5000); // ensure backend has polled at least once
+    
+    await page.waitForTimeout(10000); // ensure backend has polled at least once and server had time to shutdown
     await nextStatus(page)
     const playerCount = page.locator('.player-count')
-    await expect(playerCount).not.toHaveText('0')
     await expect(playerCount).toHaveText(/STOPPING|STOPPED/)
   })
-
+  
 })
