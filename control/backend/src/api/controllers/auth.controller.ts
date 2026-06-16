@@ -1,14 +1,9 @@
 import type { Request, Response } from 'express'
-import { COOKIE_PREFIX, IS_PRODUCTION } from "../../config/constants.js"
+import { ACCESS_TOKEN_COOKIE, IS_PRODUCTION, REFRESH_TOKEN_COOKIE, SESSION_ID_COOKIE, XSRF_TOKEN_COOKIE } from "../../config/constants.js"
 import bcrypt from 'bcrypt'
 import users from '../../services/users.service.js'
 import { createAccessToken, createToken } from '../../services/jwt.service.js'
 
-
-const refreshTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-refreshToken` : 'refreshToken'
-const accessTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-accessToken` : 'accessToken'
-const xsrfTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-xsrf-token` : 'xsrf-token'
-const sessionIdCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-sessionId` : 'sessionId'
 
 export async function handleLogin(req: Request, res: Response) {
     const { username, password } = req.body
@@ -31,9 +26,9 @@ export async function handleLogin(req: Request, res: Response) {
 }
 
 export function handleLogout(req: Request, res: Response) {
-    clearCookie(res, refreshTokenCookie)
-    clearCookie(res, accessTokenCookie)
-    clearCookie(res, xsrfTokenCookie)
+    clearCookie(res, REFRESH_TOKEN_COOKIE)
+    clearCookie(res, ACCESS_TOKEN_COOKIE)
+    clearCookie(res, XSRF_TOKEN_COOKIE)
 
     req.session.destroy((err) => {
         if (err) {
@@ -41,7 +36,7 @@ export function handleLogout(req: Request, res: Response) {
             return res.status(500).send('Logout failed')
         }
 
-        clearCookie(res, sessionIdCookie)
+        clearCookie(res, SESSION_ID_COOKIE)
         return res.json({ success: true, message: 'Logged out successfully' })
     })
 }
@@ -55,7 +50,7 @@ async function isValidPassword(password: string, hashedPassword?: string) {
 }
 
 function setLoginCookies(res: Response, refreshToken: string, accessToken: string) {
-    res.cookie(refreshTokenCookie, refreshToken, {
+    res.cookie(REFRESH_TOKEN_COOKIE, refreshToken, {
         httpOnly: true,
         secure: IS_PRODUCTION,
         sameSite: 'lax',
@@ -63,7 +58,7 @@ function setLoginCookies(res: Response, refreshToken: string, accessToken: strin
         maxAge: 1000 * 60 * 60 * 24 * 365,
     })
 
-    res.cookie(accessTokenCookie, accessToken, {
+    res.cookie(ACCESS_TOKEN_COOKIE, accessToken, {
         httpOnly: true,
         secure: IS_PRODUCTION,
         sameSite: 'lax',

@@ -14,3 +14,9 @@ const BASE_URL = process.env.BASE_URL || 'http://terraria:6002'
 const BASE_PATH = process.env.BASE_PATH || '/cgi-bin/api'
 export const API_URL = new URL(BASE_PATH, BASE_URL).toString()
 export const SESSION_BOUND_TOKEN = process.env.SESSION_BOUND_TOKEN === 'true';
+
+
+export const ACCESS_TOKEN_COOKIE = IS_PRODUCTION ? `${COOKIE_PREFIX}_access-token` : 'accessToken'
+export const REFRESH_TOKEN_COOKIE = IS_PRODUCTION ? `${COOKIE_PREFIX}_refresh-token` : 'refreshToken'
+export const XSRF_TOKEN_COOKIE = IS_PRODUCTION ? `${COOKIE_PREFIX}_xsrf-token` : 'xsrf-token'
+export const SESSION_ID_COOKIE = IS_PRODUCTION ? `${COOKIE_PREFIX}_session-id` : 'connect.sid'

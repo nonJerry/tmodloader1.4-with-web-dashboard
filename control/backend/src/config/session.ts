@@ -1,7 +1,7 @@
 import { RedisStore } from "connect-redis";
 import expressSession from "express-session";
 import { createClient } from 'redis';
-import { IS_PRODUCTION, REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD, SESSION_SECRET, COOKIE_PREFIX } from "./constants.js";
+import { IS_PRODUCTION, REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD, SESSION_SECRET, COOKIE_PREFIX, XSRF_TOKEN_COOKIE } from "./constants.js";
 import { RequestHandler } from "express";
 
 
@@ -35,7 +35,7 @@ if (IS_PRODUCTION || REDIS_USER) {
     rolling: true,
     // maxAge is 1 hour in ms
     cookie: { secure: IS_PRODUCTION, sameSite: "lax", signed: true, maxAge: 3.6e6 },
-    name: IS_PRODUCTION ? `${COOKIE_PREFIX}-sessionId` : 'connect.sid',
+    name: XSRF_TOKEN_COOKIE,
     store: redisStore,
   })
 } else {
@@ -47,6 +47,7 @@ if (IS_PRODUCTION || REDIS_USER) {
     rolling: true,
     // maxAge is 1 hour in ms
     cookie: { secure: IS_PRODUCTION, sameSite: "lax", signed: true, maxAge: 3.6e6 },
+    name: XSRF_TOKEN_COOKIE
     // Dev config without store
   })
 }

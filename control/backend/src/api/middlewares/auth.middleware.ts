@@ -1,13 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { COOKIE_PREFIX, IS_PRODUCTION } from '../../config/constants.js';
+import { ACCESS_TOKEN_COOKIE, IS_PRODUCTION, REFRESH_TOKEN_COOKIE } from '../../config/constants.js';
 import { authenticateAccessToken, refreshAccessToken, isTokenExpiredError } from '../../services/auth.service.js'
 
-const accessTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-accessToken` : 'accessToken'
-const refreshTokenCookie = IS_PRODUCTION ? `${COOKIE_PREFIX}-refreshToken` : 'refreshToken'
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
-    const accessToken = req.cookies?.[accessTokenCookie]
-    const refreshToken = req.cookies?.[refreshTokenCookie]
+    const accessToken = req.cookies?.[ACCESS_TOKEN_COOKIE]
+    const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE]
     const sessionId = req.session?.id
 
     if (!sessionId) {
@@ -49,7 +47,7 @@ function getNewAccessToken(refreshToken: string | undefined, sessionId: string) 
 }
 
 function setAccessTokenCookie(res: Response, token: string) {
-    res.cookie(accessTokenCookie, token, {
+    res.cookie(ACCESS_TOKEN_COOKIE, token, {
         httpOnly: true,
         secure: IS_PRODUCTION,
         sameSite: 'lax',
