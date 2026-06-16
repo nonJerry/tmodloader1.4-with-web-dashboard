@@ -4,8 +4,7 @@ import bcrypt from 'bcrypt'
 import users from '../../services/users.service.js'
 import { createAccessToken, createToken } from '../../services/jwt.service.js'
 
-export const handleLogin = () => {
-    return async (req: Request, res: Response) => {
+export async function handleLogin (req: Request, res: Response) {
         const { username, password } = req.body
 
         if (!username || !password) {
@@ -42,11 +41,9 @@ export const handleLogin = () => {
 
 
         res.json({ success: true, message: "Login successful" })
-    }
 }
 
-export const handleLogout = () => {
-    return async (req: Request, res: Response) => {
+export function handleLogout (req: Request, res: Response) {
         const removeCookie = (cookieName: string) => {
             res.clearCookie(cookieName, {
                 httpOnly: true,
@@ -68,6 +65,4 @@ export const handleLogout = () => {
 
             res.json({ success: true, message: "Logged out successfully" })
         })
-
-    }
 }

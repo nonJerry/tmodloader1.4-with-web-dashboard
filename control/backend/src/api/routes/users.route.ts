@@ -5,6 +5,6 @@ import { getCurrentUser } from '../controllers/users.controller.js';
 
 const usersRouter = Router();
 
-usersRouter.get('/me', authMiddleware, getCurrentUser());
+usersRouter.get('/me', authMiddleware, getCurrentUser);
 
 export default usersRouter;
