@@ -1,10 +1,12 @@
 <template>
 	<form @submit.prevent="loginFn" class="wrapped-form">
 		<label for="username">What may go here?</label>
-		<input id="username" name="username" v-model.trim="credentials.username" type="text" autocomplete="username" required />
+		<input id="username" name="username" v-model.trim="credentials.username" type="text" autocomplete="username"
+			required />
 
 		<label for="password">The second riddle?</label>
-		<input id="password" name="password" v-model.trim="credentials.password" type="password" autocomplete="current-password" required />
+		<input id="password" name="password" v-model.trim="credentials.password" type="password"
+			autocomplete="current-password" required />
 
 		<div class="to-end">
 			<button type="submit">Mystery Function</button>
@@ -13,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
 
@@ -33,6 +35,10 @@ const loginFn = async () => {
 	}
 	await router.push('/')
 }
+
+onMounted(() => {
+	document.title = 'Terraria Server Control - Login'
+})
 </script>
 
 <style lang="scss" scoped>

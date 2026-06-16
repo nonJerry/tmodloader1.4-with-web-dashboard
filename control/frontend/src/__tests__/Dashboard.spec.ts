@@ -43,7 +43,13 @@ function deferred<T>() {
 
 describe('Dashboard', () => {
 
-  it('renders title', async () => {
+  it('has correct tab title', async () => {
+    await mountWithPlayers('1')
+
+    expect(document.title).toBe('Terraria Server Control')
+  })
+
+  it('renders title on page', async () => {
     const wrapper = await mountWithPlayers('1')
 
     expect(wrapper.find('h1').text()).toContain('Terraria Server Control')

@@ -86,14 +86,15 @@ const isDisabled = computed(() => {
 })
 
 function isNumber(value?: string | number): boolean {
-    return ((value != null) &&
-      (value !== '') &&
-      !Number.isNaN(Number(value.toString())));
-  }
+  return ((value != null) &&
+    (value !== '') &&
+    !Number.isNaN(Number(value.toString())));
+}
 
 let intervalId: ReturnType<typeof setInterval>;
 
 onMounted(() => {
+  document.title = 'Terraria Server Control'
   getStatus()
 
   intervalId = globalThis.setInterval(() => {
