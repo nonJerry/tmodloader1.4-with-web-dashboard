@@ -144,7 +144,7 @@ async function setupLoginState(context: BrowserContext) {
 
   await context.addCookies([
     {
-      name: 'refreshToken',
+      name: 'refresh-token',
       value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwiaWF0IjoxNzgxMjI2MDQ5LCJleHAiOjE4MTI3ODM2NDksImF1ZCI6ImNoYWxsZW5nZXJzIiwiaXNzIjoidGVycmFyaWEtY29udHJvbCJ9.mONz0rwxTckGt2RgpDW0jbjXWj6uavSH8eQJ1ls-AWA',
       url: 'http://localhost:5173',
       httpOnly: true,
@@ -153,7 +153,7 @@ async function setupLoginState(context: BrowserContext) {
       expires: 1812762951.984077,
     },
     {
-      name: 'accessToken',
+      name: 'access-token',
       value: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwic2Vzc2lvbklkIjoicV9UMTd4VmJXdDEwWkp1WFlXS1RqcGI1cVhHbFctdHYiLCJpYXQiOjE3ODEyMjYwNDksImV4cCI6MTc4MTIyNjEwOSwiYXVkIjoiY2hhbGxlbmdlcnMiLCJpc3MiOiJ0ZXJyYXJpYS1jb250cm9sIn0.zG-ggMYMUWSWoaDBhUDtG0B0ucpAmxA9KwslSVdr2-o',
       url: 'http://localhost:5173',
       httpOnly: true,
@@ -165,7 +165,7 @@ async function setupLoginState(context: BrowserContext) {
       name: 'xsrf-token',
       value: 'e6cab63a438f71951fd7a9c3740bb2dd9e3487d455da09eff4a7ea936ad58b22.54bb340541b471ab1d409f0f0ed0d1d2a8218845085e070d673c6322d49406ce',
       url: 'http://localhost:5173',
-      httpOnly: false,
+      httpOnly: true,
       secure: false,
       sameSite: 'Lax',
       expires: undefined,
@@ -183,7 +183,7 @@ test.describe('Terraria Server Control page', () => {
 
     await ensureServerIsOnline(page)
 
-  });
+  })
 
   test('renders title', async ({ page }) => {
     await expect(page.locator('h1')).toHaveText('Terraria Server Control')
@@ -298,8 +298,8 @@ test.describe('Login', () => {
     await loginAs(page, 'alice', 'alicePassword')
     await expectDashboard(page)
 
-    await makeCookieExpire(context, 'accessToken')
-    await makeCookieExpire(context, 'refreshToken')
+    await makeCookieExpire(context, 'access-token')
+    await makeCookieExpire(context, 'refresh-token')
 
     await nextStatus(page)
     await expectLogin(page)
@@ -311,7 +311,7 @@ test.describe('Login', () => {
     await loginAs(page, 'alice', 'alicePassword')
     await expectDashboard(page)
 
-    await makeCookieExpire(context, 'accessToken')
+    await makeCookieExpire(context, 'access-token')
 
     await page.goto('/')
     await expectDashboard(page)
@@ -327,10 +327,13 @@ test.describe('Server', () => {
     await page.goto('/')
     await ensureServerIsOnline(page)
 
-  });
+  })
 
   test.afterEach(async ({ page }) => {
     await ensureServerIsOnline(page)
+    await page.request.post('http://localhost:8000/test/reset', {
+      data: {}
+    })
   })
 
   test('is stopped if nobody is logged in for 10 minutes by default', {
@@ -342,9 +345,9 @@ test.describe('Server', () => {
 
     await page.request.post('http://localhost:8000/test/advance-time', {
       data: { amount: 10 * 60 * 1000 }
-    });
+    })
 
-    await page.waitForTimeout(10000); // ensure backend has polled at least once and server had time to shutdown
+    await page.waitForTimeout(10000) // ensure backend has polled at least once and server had time to shutdown
     await nextStatus(page)
     const playerCount = page.locator('.player-count')
     await expect(playerCount).toHaveText(/STOPPING|STOPPED/)

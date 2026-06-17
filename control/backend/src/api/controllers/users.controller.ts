@@ -1,10 +1,10 @@
 import { Request, Response } from 'express'
 import { verifyToken } from '../../services/jwt.service.js'
 import users from '../../services/users.service.js'
-import { REFRESH_TOKEN_COOKIE } from '../../config/constants.js'
+import { config } from '../../config/constants.js'
 
 export function getCurrentUser(req: Request, res: Response) {
-  const token = req.cookies?.[REFRESH_TOKEN_COOKIE]
+  const token = req.cookies?.[config.refreshTokenCookie]
   const username = getAuthenticatedUsername(token)
 
   if (!username) {

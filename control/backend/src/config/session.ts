@@ -1,57 +1,57 @@
-import { RedisStore } from "connect-redis";
-import expressSession from "express-session";
-import { createClient } from 'redis';
-import { IS_PRODUCTION, REDIS_HOST, REDIS_PORT, REDIS_USER, REDIS_PASSWORD, SESSION_SECRET, COOKIE_PREFIX, XSRF_TOKEN_COOKIE } from "./constants.js";
-import { RequestHandler } from "express";
+import { RedisStore } from "connect-redis"
+import expressSession from "express-session"
+import { createClient } from 'redis'
+import { config, IS_PRODUCTION } from "./constants.js"
+import { RequestHandler } from "express"
 
 
-let potSession: RequestHandler;
+let potSession: RequestHandler
 
-if (IS_PRODUCTION || REDIS_USER) {
-  console.log(`Configuring redis store on ${REDIS_HOST}:${REDIS_PORT}`);
+if (IS_PRODUCTION || config.redisUser) {
+  console.log(`Configuring redis store on ${config.redisHost}:${config.redisPort}`)
   const redis = createClient({
-    username: REDIS_USER,
-    password: REDIS_PASSWORD,
+    username: config.redisUser,
+    password: config.redisPassword,
     socket: {
-      host: REDIS_HOST,
-      port: REDIS_PORT
+      host: config.redisHost,
+      port: config.redisPort
     }
-  });
+  })
   redis.on('connect', () => {
-    console.log('Connected to Redis');
-  });
-  redis.on('error', err => console.log('Redis Client Error', err));
+    console.log('Connected to Redis')
+  })
+  redis.on('error', err => console.log('Redis Client Error', err))
 
-  await redis.connect();
+  await redis.connect()
 
   const redisStore = new RedisStore({
     client: redis,
     prefix: "csrf-terraria-session:",
-  });
+  })
   potSession = expressSession({
-    secret: SESSION_SECRET,
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
     rolling: true,
     // maxAge is 1 hour in ms
     cookie: { secure: IS_PRODUCTION, sameSite: "lax", signed: true, maxAge: 3.6e6 },
-    name: XSRF_TOKEN_COOKIE,
+    name: config.sessionIdCookie,
     store: redisStore,
   })
 } else {
   console.log('Using memory store for sessions')
   potSession = expressSession({
-    secret: SESSION_SECRET,
+    secret: config.sessionSecret,
     resave: false,
     saveUninitialized: false,
     rolling: true,
     // maxAge is 1 hour in ms
     cookie: { secure: IS_PRODUCTION, sameSite: "lax", signed: true, maxAge: 3.6e6 },
-    name: XSRF_TOKEN_COOKIE
+    name: config.sessionIdCookie
     // Dev config without store
   })
 }
 
 const session = potSession
 
-export default session;
+export default session

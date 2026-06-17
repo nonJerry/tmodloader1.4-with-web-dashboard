@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { createAccessToken, verifyToken } from './jwt.service.js'
-import { SESSION_BOUND_TOKEN } from '../config/constants.js'
+import { config } from '../config/constants.js'
 
 export function authenticateAccessToken(accessToken: string, sessionId: string) {
   const payload = verifyToken(accessToken)
 
-  if (SESSION_BOUND_TOKEN && payload.sessionId !== sessionId) {
+  if (config.isSessionBound && payload.sessionId !== sessionId) {
     throw new jwt.JsonWebTokenError('Invalid session-bound token')
   }
 

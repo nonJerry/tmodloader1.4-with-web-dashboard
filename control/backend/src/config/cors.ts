@@ -1,11 +1,11 @@
-import expressCors from "cors";
-import { ALLOWED_ORIGINS } from "./constants.js";
+import expressCors from "cors"
+import { config } from "./constants.js"
 
-console.log(`Configuring cors with origin: '${ALLOWED_ORIGINS}'`);
+console.log(`Configuring cors with origin: '${config.allowedOrigins}'`)
 
 const corsConfig = expressCors({
-  origin: ALLOWED_ORIGINS,
+  origin: config.allowedOrigins,
   credentials: true,
-});
+})
 
-export default corsConfig;
+export default corsConfig
