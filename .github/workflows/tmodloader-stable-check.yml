@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
       with:
         path: ./
     - name: Get Current Version
@@ -19,7 +19,6 @@ jobs:
     - name: Print Repository Version
       run: echo ${{ env.REPO_VERSION }}
     - name: Update Dockerfile Version
-
       if: ${{ env.CURRENT_VERSION != env.REPO_VERSION }}
       run: sed -i "s/${{ env.CURRENT_VERSION }}/${{ env.REPO_VERSION }}/" ./Dockerfile
     - name: Login to Dockerhub
@@ -36,7 +35,7 @@ jobs:
       run: docker push ${{ secrets.DOCKER_USER }}/tmodloader1.4:${{ env.REPO_VERSION }}
     - name: Push Image to DockerHub as Latest
       run: docker push ${{ secrets.DOCKER_USER }}/tmodloader1.4:latest
-    - uses: stefanzweifel/git-auto-commit-action@v4
+    - uses: stefanzweifel/git-auto-commit-action@v7
       if: ${{ env.CURRENT_VERSION != env.REPO_VERSION }}
       with:
         commit_message: "Github Action: Updating to tModLoader version ${{ env.REPO_VERSION }}"
