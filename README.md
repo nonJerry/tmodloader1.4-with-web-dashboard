@@ -1,31 +1,29 @@
-# tModLoader Powered By Docker
-[![Discord](https://img.shields.io/discord/1132368789518950521?logo=discord&label=Discord%20Server&style=for-the-badge)](https://discord.gg/dHnVYYGed7)
+# tModLoader Powered By Docker/Podman with Web-Interface
+![Auto-Update Badge](https://img.shields.io/github/actions/workflow/status/nonJerry/tmodloader1.4-with-web-dashboard/tmodloader-stable-check.yml?logo=github&label=tModLoader%20Auto-Updater&style=for-the-badge)
 
-![Auto-Update Badge](https://img.shields.io/github/actions/workflow/status/jacobsmile/tmodloader1.4/tmodloader-check.yml?logo=github&label=tModLoader%20Auto-Updater&style=for-the-badge)
+![Contributors](https://img.shields.io/github/contributors/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
+![OpenIssues](https://img.shields.io/github/issues/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
+![ClosedIssues](https://img.shields.io/github/issues-closed/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
 
-![Contributors](https://img.shields.io/github/contributors/jacobsmile/tmodloader1.4?logo=github&style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/jacobsmile/tmodloader1.4?logo=github&label=github%20stars&style=for-the-badge)
-![OpenIssues](https://img.shields.io/github/issues/jacobsmile/tmodloader1.4?logo=github&style=for-the-badge)
-![ClosedIssues](https://img.shields.io/github/issues-closed/jacobsmile/tmodloader1.4?logo=github&style=for-the-badge)
-
-[![DockerPulls](https://img.shields.io/docker/pulls/jacobsmile/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/jacobsmile/tmodloader1.4)
-[![DockerStars](https://img.shields.io/docker/stars/jacobsmile/tmodloader1.4?logo=docker&style=for-the-badge)](](https://registry.hub.docker.com/r/jacobsmile/tmodloader1.4))
-
-[![Unraid](https://img.shields.io/badge/Available_On_Unraid_Community_Apps!-gray?logo=unraid&link=https%3A%2F%2Funraid.net%2Fcommunity%2Fapps%3Fq%3Dtmodloader%23r&style=for-the-badge)](https://unraid.net/community/apps?q=tmodloader#r)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/tmodloader1.4)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-web-server)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-backend)
 
 ---
 
-[View on Github](https://github.com/JACOBSMILE/tmodloader1.4) |
-[View on Dockerhub](https://registry.hub.docker.com/r/jacobsmile/tmodloader1.4)
+[View on Github](https://github.com/nonJerry/tmodloader1.4-with-web-dashboard) |
+[View on Dockerhub](https://registry.hub.docker.com/r/nonJerry/tmodloader1.4)
 
-This Docker Image is designed to allow for easy configuration and setup of a modded Terraria server powered by tModLoader.
+This Docker Image is designed to allow for easy configuration and setup of a modded Terraria server powered by tModLoader combined with an web interface which allows to control the state of the server.
+The tModLoader build process and image is taken from [JACOBSMILE/tmodloader1.4](https://github.com/JACOBSMILE/tmodloader1.4).
 
 ## Features
 - Easy Downloading of tModLoader mods by Workshop ID
 - Scheduled World Saving
 - Graceful Shutdowns
 - Configuration Files are optional
-- Github Automation to stay up-to-date with tModLoader's release cycle
+- Github Automation to stay up-to-date with tModLoader's stable releases (default used on Steam)
+- Web Interface which makes it possible to stop the server to avoid having the server idle e.g. over night
 
 ## Credits & Mentions
 - Terraria
@@ -35,16 +33,7 @@ This Docker Image is designed to allow for easy configuration and setup of a mod
   - [Website](https://www.tmodloader.net/)
   - [Steam Store Page](https://store.steampowered.com/app/1281930/tModLoader/)
   - [Github](https://github.com/tModLoader/tModLoader)
-- [ldericher](https://github.com/ldericher/tmodloader-docker)'s Docker implementation of tModLoader for Terraria 1.3 and command injection functionality
-- [rfvgyhn](https://github.com/rfvgyhn/tmodloader-docker)'s Docker implementation of tModLoader for Terraria 1.3
-- [guillheu](https://github.com/guillheu/tmodloader-docker)'s Docker implementation of tModLoader for Terraria 1.4
-- [FlorentLM](https://github.com/FlorentLM/tmodloader1.4) For helping clean up the Dockerfile & resolving some security concerns.
-
-## Check out all of my Terraria Images!
-
-1.4 Vanilla Terraria: [Github](https://github.com/JACOBSMILE/terraria1.4) | [Dockerhub](https://hub.docker.com/r/jacobsmile/terraria1.4)
-
-1.4 tModLoader: [Github](https://github.com/JACOBSMILE/tmodloader1.4) | [Dockerhub](https://hub.docker.com/r/jacobsmile/tmodloader1.4)
+- [JACOBSMILE](https://github.com/JACOBSMILE/tmodloader1.4)'s Docker implementation of tModLoader for Terraria 1.4
 
 # Repository Automation & Daily Automated Builds
 The Github repository has been configured with an automated workflow to check for tModLoader updates daily and update the latest image and Dockerfile with the new tModLoader version. 
@@ -207,7 +196,12 @@ Included in the Github repository is a sample `docker-compose.yml` file. Refer t
 
 Once you are satisfied with the compose file, start it with the following command.
 ```bash
-docker compose up --build
+docker compose up -d --build
+```
+
+To restart and rebuild only one component, for example the web interface, use the following command:
+```bash
+docker compose up -d --build --force-recreate --detach web
 ```
 
 # Interacting with the Server
