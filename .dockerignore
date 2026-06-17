@@ -1,3 +1,53 @@
 .git
 README.md
 docker-compose.yml
+
+# Node
+node_modules
+**/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env / secrets
+!*.env
+.env.*.local
+*.key
+*.pem
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+*.suo
+*.user
+*.userosscache
+
+# Build / caches
+dist
+build
+out
+coverage
+.cache
+.parcel-cache
+.next
+.nuxt
+.turbo
+
+# Logs / temp
+*.log
+tmp
+temp
+*.tmp
+
+# Misc
+*.bak
+*.swp
+*.seed
+*.pid
+
+# Keep control folder files needed for builds
+!control/**
+!control/**/package*.json

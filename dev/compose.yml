@@ -25,7 +25,8 @@ services:
   web:
     container_name: 'web'
     build:
-      context: ../control/frontend
+      dockerfile: control/frontend/Dockerfile
+      context: ..
       target: development
     image: terraria-web-server:local
     restart: unless-stopped
@@ -41,17 +42,18 @@ services:
     ports:
       - 5173:5173
     volumes:
-      - ../control/frontend:/app:Z,ro
-      - /app/node_modules
+      - ../control/frontend:/app/control/frontend:Z,ro
+      - /app/control/frontend/node_modules
     env_file:
       - ../control/frontend/.env
 
   api:
     container_name: 'api'
     build:
+      dockerfile: control/backend/Dockerfile
       args:
         - NODE_ENV=development
-      context: ../control/backend
+      context: ..
       target: development
     ports:
       - '8000:8000'
@@ -66,9 +68,7 @@ services:
     secrets:
       - users
     volumes:
-      - ../control/backend/src:/code/src:Z,ro
-      - ../control/backend/package.json:/code/package.json:Z,ro
-      - ../control/backend/package-lock.json:/code/package-lock.json:Z,ro
+      - ../control/backend/src:/code/control/backend/src:Z,ro
       - /code/node_modules
 
   redis:

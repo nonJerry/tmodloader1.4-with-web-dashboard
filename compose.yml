@@ -25,7 +25,8 @@ services:
   web:
     container_name: 'web'
     build: 
-      context: ./control/frontend
+      dockerfile: control/frontend/Dockerfile
+      context: .
       target: production
     image: terraria-web-server:local
     restart: unless-stopped
@@ -45,10 +46,10 @@ services:
     build:
       args:
         - NODE_ENV=production
-      context: ./control/backend
+      dockerfile: control/backend/Dockerfile
+      context: .
       target: production
     image: terraria-api:local
-    working_dir: /code
     ports:
       - '8000:8000'
     env_file:
