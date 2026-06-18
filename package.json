@@ -14,13 +14,20 @@
     "full-stack": "cd dev && podman compose up --build -d",
     "full-stack:docker": "cd dev && docker compose up --build -d",
     "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "test:ci": "npm run test:ci --workspaces",
+    "test:e2e": "npm run test:e2e --workspace control/frontend",
+    "test:frontend": "npm run test --workspace control/frontend",
+    "test:backend": "npm run test --workspace control/backend",
     "lint": "npm run lint --workspaces",
     "lint:backend": "npm --workspace control/backend run lint",
     "lint:frontend": "npm --workspace control/frontend run lint"
   },
   "devDependencies": {
+    "@vitest/ui": "^4.1.9",
     "concurrently": "^8.2.0",
     "cross-env": "^10.1.0",
+    "jsonc-parser": "^3.3.1",
     "oxlint": "^1.69.0"
   },
   "overrides": {

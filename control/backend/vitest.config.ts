@@ -14,5 +14,10 @@ export default defineConfig({
       BASE_URL: 'http://localhost:8000',
       BASE_PATH: '/cgi-bin/api',
     },
+    reporters: [
+      'html',
+      'default',
+      process.env.GITHUB_ACTIONS === 'true' ? ['dot', 'github-actions'] : ['dot'],
+    ]
   },
 })

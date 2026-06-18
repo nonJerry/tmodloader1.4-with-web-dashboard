@@ -2,13 +2,13 @@
     "name": "@terraria-podman/control-backend",
     "version": "0.1.0",
     "type": "module",
-    "main": "index.ts",
     "scripts": {
         "build": "tsc",
         "start": "npx tsc && node dist/index.js",
         "start-watch": "npx tsx watch src/index.ts",
         "dev": "cross-env NODE_ENV=development npx tsx watch src/index.ts",
-        "test": "cross-env NODE_ENV=unittest BASE_URL=http://localhost:8000 BASE_PATH=/cgi-bin/api vitest",
+        "test": "vitest",
+        "test:ci": "vitest run",
         "lint": "oxlint . --fix"
     },
     "dependencies": {
