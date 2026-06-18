@@ -14,7 +14,7 @@ jobs:
       REPO_VERSION: ${{ steps.getRepoVersion.outputs.REPO_VERSION }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           sparse-checkout: |
             Dockerfile
@@ -37,7 +37,7 @@ jobs:
       CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
          sparse-checkout: .
       - name: Update Dockerfile Version
