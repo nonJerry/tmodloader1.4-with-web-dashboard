@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 import jwt from 'jsonwebtoken'
 import * as authService from '../auth.service.js'
 import * as jwtService from '../jwt.service.js'

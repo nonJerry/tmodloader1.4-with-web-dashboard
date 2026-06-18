@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// before imports to avoid post is undefined error in auth 
+// before imports to avoid post is undefined error in auth
+type StatusResponse = { data: string }
+type csrfResponse = { data: { csrfToken: string } }
 vi.mock('@/api/useAPI', () => ({
-  useApi: vi.fn(() => ({
-    get: vi.fn().mockResolvedValue({ data: '' }),
-    post: vi.fn().mockResolvedValue({ status: 200 }),
+  useApi: vi.fn<() => { get: () => Promise<StatusResponse>; post: () => Promise<object> }>(() => ({
+    get: vi.fn<() => Promise<StatusResponse>>().mockResolvedValue({ data: '' }),
+    post: vi.fn<() => Promise<object>>().mockResolvedValue({ status: 200 }),
   })),
-  getCsrfToken: vi.fn(() => Promise.resolve({ data: { csrfToken: 'mock-csrf-token' } })),
+  getCsrfToken: vi.fn<() => Promise<csrfResponse>>(() => Promise.resolve({ data: { csrfToken: 'mock-csrf-token' } })),
 }))
 
 import { describe, expect, it, vi, beforeEach } from 'vitest'

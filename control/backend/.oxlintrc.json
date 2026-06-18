@@ -1,0 +1,28 @@
+{
+    "$schema": "../../node_modules/oxlint/configuration_schema.json",
+    "env": {
+        "node": true,
+        "es2024": true
+    },
+    "plugins": [
+        "eslint",
+        "node"
+    ],
+    "rules": {
+        "no-restricted-globals": [
+            "error",
+            "__dirname",
+            "__filename"
+        ]
+    },
+    "overrides": [
+        {
+            "files": [
+                "**/*.spec.*"
+            ],
+            "rules": {
+                "no-restricted-globals": "off"
+            }
+        }
+    ]
+}
