@@ -44,13 +44,13 @@ Additionally, the Dockerhub registry will maintain all previous versions which a
 
 ```bash
 # ":latest" will pull the most recent tModLoader version from https://github.com/tModLoader/tModLoader/releases/latest
-docker pull jacobsmile/tmodloader1.4:latest
+docker pull nonJerry/tmodloader1.4:latest
 ```
 
 ## To Pull a Specific tModLoader Image Version
 ```bash
 # Replace 'v2022.09.47.13' with the version string found at https://github.com/tModLoader/tModLoader/releases
-docker pull jacobsmile/tmodloader1.4:v2022.09.47.13
+docker pull nonJerry/tmodloader1.4:v2022.09.47.13
 ```
 
 # Container Preparation
@@ -171,7 +171,7 @@ Refer to the [Terraria Server Wiki](https://terraria.fandom.com/wiki/Server) for
 
 ```bash
 # Pull the image
-docker pull jacobsmile/tmodloader1.4:latest
+docker pull nonJerry/tmodloader1.4:latest
 
 # Execute the container
 docker run -p 7777:7777 --name tmodloader --rm \
@@ -187,7 +187,7 @@ docker run -p 7777:7777 --name tmodloader --rm \
   -e TMOD_WORLDSIZE='2' \
   -e TMOD_WORLDSEED='not the bees!' \
   -e TMOD_DIFFICULTY='3' \
-  jacobsmile/tmodloader1.4
+  nonJerry/tmodloader1.4
 ```
 
 ## Docker Compose
