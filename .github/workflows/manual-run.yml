@@ -20,13 +20,13 @@ jobs:
             Dockerfile
       - name: Get Current Version
         id: getCurrentVersion
-        run: echo "CURRENT_VERSION=$(grep -oP '(?<=\bTMOD_VERSION=)[^;]+' ./Dockerfile)" >> $GITHUB_OUTPUTS
+        run: echo "CURRENT_VERSION=$(grep -oP '(?<=\bTMOD_VERSION=)[^;]+' ./Dockerfile)" >> $GITHUB_OUTPUT
       - name: Get Repository Version
         id: getRepoVersion
-        run: echo "REPO_VERSION=$(curl -sL https://api.github.com/repos/tModLoader/tModLoader/releases | jq -r "map(select(.prerelease==false)) | first | .tag_name")" >> $GITHUB_OUTPUTS
+        run: echo "REPO_VERSION=$(curl -sL https://api.github.com/repos/tModLoader/tModLoader/releases | jq -r "map(select(.prerelease==false)) | first | .tag_name")" >> $GITHUB_OUTPUT
       - name: Compare Versions
         id: compareVersions
-        run: echo "SHOULD_UPDATE=${{ env.CURRENT_VERSION != env.REPO_VERSION }}" >> $GITHUB_OUTPUTS
+        run: echo "SHOULD_UPDATE=${{ env.CURRENT_VERSION != env.REPO_VERSION }}" >> $GITHUB_OUTPUT
 
   update-repo:
     runs-on: ubuntu-latest
