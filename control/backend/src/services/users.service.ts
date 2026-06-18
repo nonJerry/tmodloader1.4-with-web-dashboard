@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 
 console.log(process.env.USERS_FILE_PATH)
@@ -8,7 +9,10 @@ const DEFAULT_SECRET_PATHS = [
   '/run/secrets/users'
 ].filter((p): p is string => typeof p === 'string') // remove not set env vars
 
-const usersFilePath = path.resolve(DEFAULT_SECRET_PATHS.find(filePath => fs.existsSync(filePath)) || '../../example.users.json')
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, "../../../..");
+const usersFilePath = path.resolve(projectRoot, DEFAULT_SECRET_PATHS.find(filePath => fs.existsSync(filePath)) || 'example.users.json')
 
 const users = JSON.parse(
   fs.readFileSync(usersFilePath, 'utf8')

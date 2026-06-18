@@ -8,7 +8,8 @@ const envTestUsers = {
   bob: '$2b$10$hashvalue2',
 }
 
-const usersFile = path.resolve('tmp/users.json')
+const projectRoot = path.resolve(__dirname, "../../../../..");
+const usersFile = path.resolve(__dirname, 'tmp/users.json')
 
 describe('Users service', () => {
   beforeAll(() => {
@@ -19,7 +20,7 @@ describe('Users service', () => {
   afterAll(() => {
     vi.unstubAllEnvs()
     mockFiles.restore()
-    fs.rmSync(usersFile)
+    fs.rmSync(usersFile);
     fs.rmdirSync(path.dirname(usersFile))
   })
 
@@ -36,15 +37,14 @@ describe('Users service', () => {
     expect(Object.values(users)).toEqual(expect.arrayContaining([expect.any(String)]))
   })
 
-  it('loads users from ../../example.users.json if no secret file is provided', async () => {
+  it('loads users from example.users.json if no secret file is provided', async () => {
     const defaultTestUsers = {
       takagi: '$2b$10$hashvalue3'
     }
     vi.unstubAllEnvs()
     vi.resetModules()
-
     mockFiles({
-      [path.resolve('../../example.users.json')]: JSON.stringify(defaultTestUsers)
+      [path.resolve(projectRoot, 'example.users.json')]: JSON.stringify(defaultTestUsers)
     })
     const { default: users } = await import('../users.service.js')
 
