@@ -1,4 +1,4 @@
-# tModLoader Powered By Docker/Podman with Web-Interface
+# tModLoader Powered By Docker/Podman With Web Interface
 ![Auto-Update Badge](https://img.shields.io/github/actions/workflow/status/nonJerry/tmodloader1.4-with-web-dashboard/tmodloader-stable-check.yml?logo=github&label=tModLoader%20Auto-Updater&style=for-the-badge)
 
 ![Contributors](https://img.shields.io/github/contributors/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
@@ -6,8 +6,8 @@
 ![ClosedIssues](https://img.shields.io/github/issues-closed/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
 
 [![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/tmodloader1.4)
-[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-web-server)
-[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-backend)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/terraria-frontend?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-frontend)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/terraria-backend?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-backend)
 
 ---
 
