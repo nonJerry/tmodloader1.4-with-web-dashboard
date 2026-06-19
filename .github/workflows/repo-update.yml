@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   check-tmodloader-version:
     if: github.event.pull_request.merged == true
@@ -47,6 +47,7 @@ jobs:
       - check-tmodloader-version
       - tests
     uses: ./.github/workflows/update-tmodloader-image.yml
+    secrets: inherit
     with:
       SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
       REPO_VERSION: ${{needs.check-tmodloader-version.outputs.REPO_VERSION}}
