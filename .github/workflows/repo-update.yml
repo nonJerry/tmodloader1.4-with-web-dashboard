@@ -28,22 +28,32 @@ jobs:
       - name: Get Repository Version
         id: getRepoVersion
         run: echo "REPO_VERSION=$(curl -sL https://api.github.com/repos/tModLoader/tModLoader/releases | jq -r 'map(select(.prerelease==false)) | first | .tag_name')" >> $GITHUB_OUTPUT
-        
+
       - name: Compare Versions
         id: compareVersions
         run: echo "SHOULD_UPDATE=${{ steps.getCurrentVersion.outputs.CURRENT_VERSION != steps.getRepoVersion.outputs.REPO_VERSION }}" >> $GITHUB_OUTPUT
 
-  tests:
+  build:
     needs: check-tmodloader-version
+    uses: ./.github/workflows/build.yml
+    with:
+      SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
+      REPO_VERSION: ${{needs.check-tmodloader-version.outputs.REPO_VERSION}}
+      CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
+
+  tests:
+    needs:
+      - check-tmodloader-version
+      - build
     uses: ./.github/workflows/test.yml
     with:
       SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
       REPO_VERSION: ${{needs.check-tmodloader-version.outputs.REPO_VERSION}}
       CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
-  
+
   update-tmodloader-image:
     if: github.event.pull_request.merged == true
-    needs: 
+    needs:
       - check-tmodloader-version
       - tests
     uses: ./.github/workflows/update-tmodloader-image.yml
@@ -52,4 +62,3 @@ jobs:
       SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
       REPO_VERSION: ${{needs.check-tmodloader-version.outputs.REPO_VERSION}}
       CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
-

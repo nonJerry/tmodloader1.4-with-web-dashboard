@@ -3,17 +3,17 @@ on:
   workflow_dispatch:
     inputs:
       release:
-        description: 'The tModLoader Release to download and build.'
+        description: "The tModLoader Release to download and build."
         required: true
         type: string
       aslatest:
-        description: 'Should this push as latest?'
+        description: "Should this push as latest?"
         required: true
         type: boolean
 
 permissions:
   contents: write
-  
+
 jobs:
   check-tmodloader-version:
     runs-on: ubuntu-latest
@@ -40,8 +40,18 @@ jobs:
         id: compareVersions
         run: echo "SHOULD_UPDATE=${{ steps.getCurrentVersion.outputs.CURRENT_VERSION != steps.getRepoVersion.outputs.REPO_VERSION }}" >> $GITHUB_OUTPUT
 
-  tests:
+  build:
     needs: check-tmodloader-version
+    uses: ./.github/workflows/build.yml
+    with:
+      SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
+      REPO_VERSION: ${{needs.check-tmodloader-version.outputs.REPO_VERSION}}
+      CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
+
+  tests:
+    needs:
+      - check-tmodloader-version
+      - build
     uses: ./.github/workflows/test.yml
     with:
       SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
@@ -50,7 +60,7 @@ jobs:
 
   manual-run:
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - check-tmodloader-version
       - tests
     env:
@@ -61,7 +71,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
         with:
-         sparse-checkout: .
+          sparse-checkout: .
 
       - name: Print Version to Download
         run: echo ${{ inputs.release }}
@@ -93,6 +103,5 @@ jobs:
         with:
           push: true
           cache-from: type=gha
-          cache-to: type=gha,mode=max  
+          cache-to: type=gha,mode=max
           tags: ${{ vars.DOCKER_USER }}/tmodloader1.4:latest
-

@@ -7,7 +7,7 @@ services:
         - type=gha
       cache_to:
         - type=gha,mode=max
-    image: terraria:ci
+    image: nonjerry/tmodloader1.4:ci
     restart: unless-stopped
     healthcheck:
       test: "nc -z 127.0.0.1 6002 || exit 1"
@@ -37,7 +37,7 @@ services:
         - type=gha
       cache_to:
         - type=gha,mode=max
-    image: terraria-frontend:ci
+    image: nonjerry/terraria-frontend:ci
     restart: unless-stopped
     healthcheck:
       test: "wget --quiet --tries=1 --spider http://127.0.0.1:5173 || exit 1"
@@ -58,7 +58,7 @@ services:
 
   backend:
     container_name: 'backend'
-    image: terraria-backend:ci
+    image: nonjerry/terraria-backend:ci
     build:
       dockerfile: control/backend/Dockerfile
       args:
