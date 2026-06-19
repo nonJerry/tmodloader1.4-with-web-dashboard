@@ -99,3 +99,13 @@ jobs:
 
       - name: Run e2e tests
         run: pnpm test:e2e
+
+  persist-cache:
+    runs-on: ubuntu-latest
+    needs: 
+      - unit
+      - e2e
+    if: always()
+    steps:
+      - name: Dummy step to trigger post
+        run: echo "Cache you are not escaping."
