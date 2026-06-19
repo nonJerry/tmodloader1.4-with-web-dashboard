@@ -92,7 +92,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Create empty .env files
-        run: touch .env dev/.env control/frontend/.env control/backend/.env
+        run: touch .env dev/.env control/frontend/.env control/backend/.env /control/redis/redis.env control/redis/redis.conf
 
       - name: Run e2e tests
         run: pnpm e2e
