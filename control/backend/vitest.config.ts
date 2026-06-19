@@ -7,7 +7,7 @@ export default defineConfig({
     restoreMocks: true,
     clearMocks: true,
     unstubEnvs: true,
-    exclude: [...configDefaults.exclude, 'e2e/**'],
+    exclude: [...configDefaults.exclude, 'e2e/**', 'dist/**'],
     root: fileURLToPath(new URL('./', import.meta.url)),
     env: {
       NODE_ENV: 'unittest',
