@@ -22,7 +22,7 @@ const username = process.argv[2];
 const password = process.argv[3];
 
 if (!username || !password) {
-    console.log("Usage: npx ts-node addUser.ts <username> <password>");
+    console.log("Usage: pnx ts-node addUser.ts <username> <password>");
     process.exit(1);
 }
 

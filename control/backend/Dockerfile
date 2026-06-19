@@ -1,13 +1,16 @@
-FROM node:slim AS dependencies
+FROM node:lts-alpine AS dependencies
+ENV CI=true
 WORKDIR /code
-COPY package.json /code/package.json
-COPY package-lock.json /code/package-lock.json
-COPY control/backend/package.json /code/control/backend/package.json
-RUN npm ci --workspace @terraria-podman/control-backend
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY control/backend/package.json ./control/backend/package.json
+RUN npm i -g pnpm && pnpm ci --filter @terraria-podman/control-backend
 
 FROM dependencies AS build
-COPY control/backend /code/control/backend
-RUN npm run build --workspace @terraria-podman/control-backend
+COPY control/backend/tsconfig.json /code/control/backend/tsconfig.json
+COPY control/backend/src /code/control/backend/src
+RUN pnpm --filter @terraria-podman/control-backend build
+RUN pnpm --filter @terraria-podman/control-backend --prod deploy /app
+RUN rm -rf /app/src/ && mv /app/dist/src/ /app/src/ && rm -rf /app/dist
 
 FROM dependencies AS development
 ARG NODE_ENV=development
@@ -15,15 +18,14 @@ ENV NODE_ENV $NODE_ENV
 ARG PORT=80
 ENV PORT $PORT
 WORKDIR /code/control/backend
-COPY control/backend /code/control/backend
-CMD ["npx", "tsx", "watch", "src/index.ts"]
+COPY control/backend/src /code/control/backend/src
+ENTRYPOINT ["pnx", "tsx", "watch", "src/index.ts"]
 EXPOSE $PORT 9229 9230
 
 
-FROM dependencies AS production
+FROM node:lts-alpine AS production
 ARG NODE_ENV=production
-RUN npm prune --omit=dev
-WORKDIR /code/control/backend/
-COPY --from=build /code/control/backend/dist /code/control/backend/
-CMD [ "node", "src/index.js" ]
+WORKDIR /app
+COPY --from=build /app /app
+ENTRYPOINT [ "node", "src/index.js" ]
 EXPOSE 8000
