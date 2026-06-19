@@ -8,7 +8,7 @@
     "control/frontend"
   ],
   "scripts": {
-    "dev": "concurrently \"pnpm --filter @terraria-podman/control-backend dev  \" \"pnpm --filter @terraria-podman/control-frontend dev\"",
+    "dev": "pnpm -r dev",
     "dev:backend": "pnpm --filter @terraria-podman/control-backend dev",
     "dev:frontend": "pnpm --filter @terraria-podman/control-frontend dev",
     "full-stack": "cd dev && podman compose up --build -d",
