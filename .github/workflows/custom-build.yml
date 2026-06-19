@@ -10,6 +10,10 @@ on:
         description: 'Should this push as latest?'
         required: true
         type: boolean
+
+permissions:
+  contents: write
+  
 jobs:
   check-tmodloader-version:
     runs-on: ubuntu-latest

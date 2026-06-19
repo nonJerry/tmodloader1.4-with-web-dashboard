@@ -4,6 +4,9 @@ on:
     types:
       - closed
 
+permissions:
+  contents: write
+  
 jobs:
   check-tmodloader-version:
     if: github.event.pull_request.merged == true
