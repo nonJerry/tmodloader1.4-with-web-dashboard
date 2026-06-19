@@ -29,7 +29,7 @@ jobs:
       REPO_VERSION: ${{ inputs.REPO_VERSION }}
       CURRENT_VERSION: ${{ inputs.CURRENT_VERSION }}
 
-     strategy:
+    strategy:
       matrix:
         image:
           - name: tmodloader1.4
@@ -44,7 +44,7 @@ jobs:
             target: development
             dockerfile: ./control/backend/Dockerfile
             args: NODE_ENV=development
-            
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
