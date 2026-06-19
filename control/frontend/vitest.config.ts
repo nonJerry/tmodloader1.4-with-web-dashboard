@@ -11,11 +11,7 @@ export default mergeConfig(
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
-      reporters: [
-      'html',
-      'default',
-      process.env.GITHUB_ACTIONS === 'true' ? ['dot', 'github-actions'] : ['dot'],
-    ]
+      reporters: process.env.GITHUB_ACTIONS === 'true' ? ['dot', 'github-actions'] : ['html', 'tree'],
     },
   }),
 )
