@@ -20,7 +20,7 @@ permissions:
   contents: write
 
 jobs:
-  unit-test:
+  unit:
     runs-on: ubuntu-latest
     env:
       PUPPETEER_SKIP_DOWNLOAD: "true"
@@ -50,7 +50,7 @@ jobs:
       - name: Run unit tests
         run: pnpm run test
 
-  e2e-test:
+  e2e:
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
