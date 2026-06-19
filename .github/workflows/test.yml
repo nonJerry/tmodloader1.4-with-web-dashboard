@@ -95,7 +95,7 @@ jobs:
         run: touch .env dev/.env control/frontend/.env control/backend/.env control/redis/redis.env control/redis/redis.conf
 
       - name: Build and Start Docker Full Stack
-        run: pnpm full-stack
+        run: pnpm full-stack:docker
 
       - name: Run e2e tests
         run: pnpm test:e2e
