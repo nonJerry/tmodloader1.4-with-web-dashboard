@@ -64,3 +64,22 @@ jobs:
           load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install deps
+        run: pnpm install
+
+      - name: Lint repository
+        run: pnpm lint
+
+      - name: Build repository
+        run: pnpm build
