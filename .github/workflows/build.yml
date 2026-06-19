@@ -33,16 +33,16 @@ jobs:
       matrix:
         image:
           - name: tmodloader1.4
-            context: .
             dockerfile: ./Dockerfile
+            context: .
           - name: terraria-frontend
-            context: ./frontend
-            target: development
             dockerfile: ./control/frontend/Dockerfile
-          - name: terraria-backend
-            context: ./backend
+            context: ./control/frontend
             target: development
+          - name: terraria-backend
             dockerfile: ./control/backend/Dockerfile
+            context: ./control/backend
+            target: development
             args: NODE_ENV=development
 
     steps:
