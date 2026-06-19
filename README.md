@@ -1,18 +1,18 @@
 # tModLoader Powered By Docker/Podman With Web Interface
-![Auto-Update Badge](https://img.shields.io/github/actions/workflow/status/nonJerry/tmodloader1.4-with-web-dashboard/tmodloader-stable-check.yml?logo=github&label=tModLoader%20Auto-Updater&style=for-the-badge)
+![Auto-Update Badge](https://img.shields.io/github/actions/workflow/status/nonjerry/tmodloader1.4-with-web-dashboard/tmodloader-stable-check.yml?logo=github&label=tModLoader%20Auto-Updater&style=for-the-badge)
 
-![Contributors](https://img.shields.io/github/contributors/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
-![OpenIssues](https://img.shields.io/github/issues/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
-![ClosedIssues](https://img.shields.io/github/issues-closed/nonJerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
+![Contributors](https://img.shields.io/github/contributors/nonjerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
+![OpenIssues](https://img.shields.io/github/issues/nonjerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
+![ClosedIssues](https://img.shields.io/github/issues-closed/nonjerry/tmodloader1.4-with-web-dashboard?logo=github&style=for-the-badge)
 
-[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/tmodloader1.4)
-[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/terraria-frontend?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-frontend)
-[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/terraria-backend?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonJerry/terraria-backend)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/tmodloader1.4?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonjerry/tmodloader1.4)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/terraria-frontend?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonjerry/terraria-frontend)
+[![DockerPulls](https://img.shields.io/docker/pulls/nonjerry/terraria-backend?logo=docker&style=for-the-badge)](https://registry.hub.docker.com/r/nonjerry/terraria-backend)
 
 ---
 
-[View on Github](https://github.com/nonJerry/tmodloader1.4-with-web-dashboard) |
-[View on Dockerhub](https://registry.hub.docker.com/r/nonJerry/tmodloader1.4)
+[View on Github](https://github.com/nonjerry/tmodloader1.4-with-web-dashboard) |
+[View on Dockerhub](https://registry.hub.docker.com/r/nonjerry/tmodloader1.4)
 
 This Docker Image is designed to allow for easy configuration and setup of a modded Terraria server powered by tModLoader combined with an web interface which allows to control the state of the server.
 The tModLoader build process and image is taken from [JACOBSMILE/tmodloader1.4](https://github.com/JACOBSMILE/tmodloader1.4).
@@ -44,13 +44,13 @@ Additionally, the Dockerhub registry will maintain all previous versions which a
 
 ```bash
 # ":latest" will pull the most recent tModLoader version from https://github.com/tModLoader/tModLoader/releases/latest
-docker pull nonJerry/tmodloader1.4:latest
+docker pull nonjerry/tmodloader1.4:latest
 ```
 
 ## To Pull a Specific tModLoader Image Version
 ```bash
 # Replace 'v2022.09.47.13' with the version string found at https://github.com/tModLoader/tModLoader/releases
-docker pull nonJerry/tmodloader1.4:v2022.09.47.13
+docker pull nonjerry/tmodloader1.4:v2022.09.47.13
 ```
 
 # Container Preparation
@@ -171,7 +171,7 @@ Refer to the [Terraria Server Wiki](https://terraria.fandom.com/wiki/Server) for
 
 ```bash
 # Pull the image
-docker pull nonJerry/tmodloader1.4:latest
+docker pull nonjerry/tmodloader1.4:latest
 
 # Execute the container
 docker run -p 7777:7777 --name tmodloader --rm \
@@ -187,7 +187,7 @@ docker run -p 7777:7777 --name tmodloader --rm \
   -e TMOD_WORLDSIZE='2' \
   -e TMOD_WORLDSEED='not the bees!' \
   -e TMOD_DIFFICULTY='3' \
-  nonJerry/tmodloader1.4
+  nonjerry/tmodloader1.4
 ```
 
 ## Docker Compose
