@@ -18,7 +18,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     screenshot: 'only-on-failure',
-    baseURL: process.env.CI ? 'http://localhost:4173' : 'http://localhost:5173',
+    baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
     headless: true
   },
