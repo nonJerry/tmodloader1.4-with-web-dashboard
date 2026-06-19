@@ -3,7 +3,7 @@ ENV CI=true
 WORKDIR /code
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY control/backend/package.json ./control/backend/package.json
-RUN npm i -g pnpm && pnpm ci --filter @terraria-podman/control-backend
+RUN npm i -g pnpm && pnpm --filter @terraria-podman/control-backend ci
 
 FROM dependencies AS build
 COPY control/backend/tsconfig.json /code/control/backend/tsconfig.json

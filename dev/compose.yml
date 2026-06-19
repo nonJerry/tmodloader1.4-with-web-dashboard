@@ -1,8 +1,13 @@
 services:
   terraria:
     container_name: 'terraria'
-    build: ..
-    image: terraria:local
+    build: 
+      context: ..
+      cache_from:
+        - type=gha
+      cache_to:
+        - type=gha,mode=max
+    image: terraria:ci
     restart: unless-stopped
     healthcheck:
       test: "nc -z 127.0.0.1 6002 || exit 1"
@@ -28,7 +33,11 @@ services:
       dockerfile: control/frontend/Dockerfile
       context: ..
       target: development
-    image: terraria-web-server:local
+      cache_from:
+        - type=gha
+      cache_to:
+        - type=gha,mode=max
+    image: terraria-frontend:ci
     restart: unless-stopped
     healthcheck:
       test: "wget --quiet --tries=1 --spider http://127.0.0.1:5173 || exit 1"
@@ -47,14 +56,19 @@ services:
     env_file:
       - ../control/frontend/.env
 
-  api:
-    container_name: 'api'
+  backend:
+    container_name: 'backend'
+    image: terraria-backend:ci
     build:
       dockerfile: control/backend/Dockerfile
       args:
         - NODE_ENV=development
       context: ..
       target: development
+      cache_from:
+        - type=gha
+      cache_to:
+        - type=gha,mode=max
     ports:
       - '8000:8000'
     env_file:

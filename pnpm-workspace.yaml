@@ -4,6 +4,7 @@ packages:
 allowBuilds:
   '@parcel/watcher': true
   bcrypt: true
+  puppeteer: true
 configDependencies:
   '@pnpm/plugin-types-fixer': 0.1.0
 injectWorkspacePackages: true

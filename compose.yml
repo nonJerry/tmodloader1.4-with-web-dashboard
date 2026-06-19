@@ -2,7 +2,7 @@ services:
   terraria:
     container_name: 'terraria'
     build: .
-    image: terraria:local
+    image: nonJerry/tmodloader1.4:latest
     restart: unless-stopped
     healthcheck:
       test: "nc -z 127.0.0.1 6002 || exit 1"
@@ -28,7 +28,7 @@ services:
       dockerfile: control/frontend/Dockerfile
       context: .
       target: production
-    image: terraria-web-server:local
+    image: nonJerry/terraria-frontend:latest
     restart: unless-stopped
     healthcheck:
       test: "wget --quiet --tries=1 --spider http://127.0.0.1:8080 || exit 1"
@@ -41,15 +41,15 @@ services:
     env_file:
       - ./control/frontend/.env
 
-  api:
-    container_name: 'api'
+  backend:
+    container_name: 'backend'
     build:
       args:
         - NODE_ENV=production
       dockerfile: control/backend/Dockerfile
       context: .
       target: production
-    image: terraria-api:local
+    image: nonJerry/terraria-backend:latest
     ports:
       - '8000:8000'
     env_file:

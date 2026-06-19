@@ -19,6 +19,7 @@
     "test:e2e": "pnpm --filter @terraria-podman/control-frontend test:e2e ",
     "test:frontend": "pnpm --filter @terraria-podman/control-frontend test",
     "test:backend": "pnpm --filter @terraria-podman/control-backend test",
+    "e2e": "pnpm full-stack:docker && pnpm test:e2e",
     "lint": "pnpm -r lint",
     "lint:backend": "pnpm --filter @terraria-podman/control-backend lint",
     "lint:frontend": "pnpm --filter @terraria-podman/control-frontend lint"

@@ -24,40 +24,21 @@ jobs:
       - name: Compare Versions
         id: compareVersions
         run: echo "SHOULD_UPDATE=${{ steps.getCurrentVersion.outputs.CURRENT_VERSION != steps.getRepoVersion.outputs.REPO_VERSION }}" >> $GITHUB_OUTPUT
-
-  update-repo:
-    runs-on: ubuntu-latest
+        
+  tests:
     needs: check-tmodloader-version
-    env:
+    uses: ./.github/workflows/test.yml
+    with:
       SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
       REPO_VERSION: ${{needs.check-tmodloader-version.outputs.REPO_VERSION}}
       CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v7
-        with:
-         sparse-checkout: .
-      - name: Update Dockerfile Version
-        if: ${{ env.SHOULD_UPDATE == 'true' }}
-        run: sed -i "s/${{ env.CURRENT_VERSION }}/${{ env.REPO_VERSION }}/" ./Dockerfile
-      - name: Login to Dockerhub
-        env:
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-      - name: Build Docker Image
-        run: "docker build . --file ./Dockerfile --tag ${{ secrets.DOCKER_USER }}/tmodloader1.4:${{ env.REPO_VERSION }} --tag ${{ secrets.DOCKER_USER }}/tmodloader1.4:latest"
-      - name: Push Image to DockerHub as Version
-        run: docker push ${{ secrets.DOCKER_USER }}/tmodloader1.4:${{ env.REPO_VERSION }}
-      - name: Push Image to DockerHub as Latest
-        run: docker push ${{ secrets.DOCKER_USER }}/tmodloader1.4:latest
-      - uses: stefanzweifel/git-auto-commit-action@v7
-        with:
-          commit_user_name: Manual Update Bot
-          commit_message: "Github Action: Updating to tModLoader version ${{ env.REPO_VERSION }}"
-          commit_options: '--no-verify --signoff'
-          repository: .
-          tagging_message: '${{ env.REPO_VERSION }}'
-          skip_fetch: true
-          skip_checkout: true
-          create_branch: false
+
+  update-repo:
+    needs:
+      - check-tmodloader-version
+      - tests
+    uses: ./.github/workflows/update-tmodloader-image.yml
+    with:
+      SHOULD_UPDATE: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE }}
+      REPO_VERSION: ${{needs.check-tmodloader-version.outputs.REPO_VERSION}}
+      CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}

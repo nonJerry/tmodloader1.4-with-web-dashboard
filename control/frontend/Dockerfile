@@ -2,7 +2,7 @@ FROM node:lts-alpine AS dependencies
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY control/frontend/ /app/control/frontend/
-RUN npm i -g pnpm && pnpm ci --filter @terraria-podman/control-frontend --include=optional
+RUN npm i -g pnpm && pnpm --filter @terraria-podman/control-frontend ci --include=optional
 
 
 FROM dependencies AS build
