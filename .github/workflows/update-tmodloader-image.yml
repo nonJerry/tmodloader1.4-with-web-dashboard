@@ -29,6 +29,7 @@ jobs:
       DOCKER_BUILDKIT: 1
       COMPOSE_DOCKER_CLI_BUILD: 1
     steps:
+      - run: docker compose version
       - name: Checkout Repository
         uses: actions/checkout@v7
         with:
