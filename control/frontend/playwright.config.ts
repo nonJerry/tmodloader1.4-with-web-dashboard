@@ -53,6 +53,7 @@ export default defineConfig({
     command: process.env.CI ? 'pnpm full-stack-no-build:docker' : 'pnpm dev',
     port: 5173,
     cwd: '../../',
-    reuseExistingServer: !process.env.CI
+    reuseExistingServer:true,
+    wait: { stdout: /tail: '\/tmp\/tmod\.pipe' has appeared/ }
   },
 })
