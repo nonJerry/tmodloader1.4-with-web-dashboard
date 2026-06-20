@@ -60,6 +60,7 @@ jobs:
         with:
           context: ${{ matrix.image.context }}
           file: ${{ matrix.image.dockerfile }}
+          target: ${{ matrix.image.target }}
           tags: nonjerry/${{ matrix.image.name }}:ci
           load: true
           cache-from: type=gha
