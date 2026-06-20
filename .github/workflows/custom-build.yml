@@ -78,8 +78,8 @@ jobs:
           name: tmodloader1.4-image
           path: ${{ runner.temp }}/
       - run: docker load -i ${{ runner.temp }}/tmodloader1.4-image.tar
-      - run: docker tag tmodloader1.4:ci tmodloader1.4:latest
-      - run: docker tag tmodloader1.4:ci tmodloader1.4:${{ inputs.release }}
+      - run: docker tag nonjerry/tmodloader1.4:ci nonjerry/tmodloader1.4:latest
+      - run: docker tag nonjerry/tmodloader1.4:ci nonjerry/tmodloader1.4:${{ inputs.release }}
 
       - name: Print Version to Download
         run: echo ${{ inputs.release }}
