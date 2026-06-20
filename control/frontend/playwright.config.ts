@@ -52,6 +52,7 @@ export default defineConfig({
   webServer: {
     command: process.env.CI ? 'pnpm full-stack-no-build:docker' : 'pnpm dev',
     port: 5173,
+    cwd: '../../',
     reuseExistingServer: !process.env.CI
   },
 })
