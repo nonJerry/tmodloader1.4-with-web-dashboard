@@ -50,9 +50,8 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: process.env.CI ? 'pnpm full-stack-no-build:docker' : 'pnpm dev',
+    command: process.env.CI ? '' : 'pnpm dev',
     port: 5173,
-    reuseExistingServer: !process.env.CI,
-      timeout: 4 * 60 * 1000,
+    reuseExistingServer: true
   },
 })
