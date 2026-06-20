@@ -56,8 +56,12 @@ jobs:
         with:
           push: true
           load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha,scope=tmodloader1.4
+            type=registry,ref=ghcr.io/nonjerry/tmodloader1.4:buildcache
+          cache-to: |
+            type=gha,mode=max,scope=tmodloader1.4
+            type=registry,mode=max,ref=ghcr.io/nonjerry/tmodloader1.4:buildcache
           tags: |
             ${{ vars.DOCKER_USER }}/tmodloader1.4:${{ env.REPO_VERSION }}
             ${{ vars.DOCKER_USER }}/tmodloader1.4:latest

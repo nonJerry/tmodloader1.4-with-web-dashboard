@@ -56,15 +56,19 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: ${{ matrix.image.context }}
           file: ${{ matrix.image.dockerfile }}
           target: ${{ matrix.image.target }}
           tags: nonjerry/${{ matrix.image.name }}:ci
           load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha,scope=${{ matrix.image.name }}
+            type=registry,ref=ghcr.io/nonjerry/${{ matrix.image.name }}:buildcache
+          cache-to: |
+            type=gha,mode=max,scope=${{ matrix.image.name }}
+            type=registry,mode=max,ref=ghcr.io/nonjerry/${{ matrix.image.name }}:buildcache
 
       - run: docker save nonjerry/${{ matrix.image.name }}:ci -o ${{ matrix.image.name }}-image.tar
 
