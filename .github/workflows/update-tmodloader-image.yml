@@ -34,10 +34,14 @@ jobs:
         with:
           sparse-checkout: .
 
-      - name: Update Dockerfile Version
-        if: ${{ env.SHOULD_UPDATE == 'true' }}
-        run: sed -i "s/${{ env.CURRENT_VERSION }}/${{ env.REPO_VERSION }}/" ./Dockerfile
-
+      - uses: actions/download-artifact@v7
+        with:
+          name: tmodloader1.4-image
+          path: ${{ runner.temp }}/
+      - run: docker load -i ${{ runner.temp }}/tmodloader1.4-image.tar
+      - run: docker tag tmodloader1.4:ci tmodloader1.4:latest
+      - run: docker tag tmodloader1.4:ci tmodloader1.4:${{ env.REPO_VERSION }}
+      
       - name: Login to Docker Hub
         uses: docker/login-action@v4
         with:
@@ -51,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: true
+          load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: |

@@ -65,6 +65,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - run: docker save nonjerry/${{ matrix.image.name }}:ci -o ${{ matrix.image.name }}-image.tar
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.image.name }}-image
+          path: ${{ matrix.image.name }}-image.tar
+
   lint:
     runs-on: ubuntu-latest
 

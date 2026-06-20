@@ -73,6 +73,14 @@ jobs:
         with:
           sparse-checkout: .
 
+      - uses: actions/download-artifact@v7
+        with:
+          name: tmodloader1.4-image
+          path: ${{ runner.temp }}/
+      - run: docker load -i ${{ runner.temp }}/tmodloader1.4-image.tar
+      - run: docker tag tmodloader1.4:ci tmodloader1.4:latest
+      - run: docker tag tmodloader1.4:ci tmodloader1.4:${{ inputs.release }}
+
       - name: Print Version to Download
         run: echo ${{ inputs.release }}
 
@@ -93,6 +101,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: true
+          load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ vars.DOCKER_USER }}/tmodloader1.4:${{ inputs.release }}
@@ -102,6 +111,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           push: true
+          load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           tags: ${{ vars.DOCKER_USER }}/tmodloader1.4:latest
