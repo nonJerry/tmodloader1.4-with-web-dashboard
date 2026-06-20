@@ -116,9 +116,10 @@ jobs:
         run: pnpm full-stack-no-build:docker
 
       - name: Debug containers
+        working-directory: dev
         run: |
           docker compose ps
-          docker compose log
+          docker compose logs web
           
       - name: Wait for web server to be ready
         run: |
