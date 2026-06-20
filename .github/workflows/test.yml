@@ -112,23 +112,6 @@ jobs:
       - name: Create empty config files
         run: touch .env dev/.env control/frontend/.env control/backend/.env control/redis/redis.env control/redis/redis.conf
 
-      - name: Start Full Stack
-        run: pnpm full-stack-no-build:docker
-
-      - name: Debug containers
-        working-directory: dev
-        run: |
-          docker compose ps
-          docker compose logs web
-          
-      - name: Wait for web server to be ready
-        run: |
-          timeout 60 bash -c '
-            until curl -sf http://localhost:5173/login; do
-              echo "Waiting for service..."
-              sleep 2
-            done
-          '
 
       - name: Run e2e tests
-        run: pnpm test:e2e
+        run: pnpm e2e:test
