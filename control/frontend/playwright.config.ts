@@ -53,5 +53,6 @@ export default defineConfig({
     command: process.env.CI ? 'pnpm full-stack-no-build:docker' : 'pnpm dev',
     port: 5173,
     reuseExistingServer: !process.env.CI,
+      timeout: 4 * 60 * 1000,
   },
 })
