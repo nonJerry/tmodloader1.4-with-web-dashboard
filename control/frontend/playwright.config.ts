@@ -51,9 +51,9 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI ? 'pnpm full-stack-no-build:docker' : 'pnpm dev',
-    port: 5173,
+    url: 'http://localhost:5173',
     cwd: '../../',
     reuseExistingServer:true,
-    wait: { stdout: /tail: '\/tmp\/tmod\.pipe' has appeared/ }
+    timeout: 120 * 1000,
   },
 })
