@@ -37,11 +37,11 @@ jobs:
             context: .
           - name: terraria-frontend
             dockerfile: control/frontend/Dockerfile
-            context: control/frontend
+            context: .
             target: development
           - name: terraria-backend
             dockerfile: control/backend/Dockerfile
-            context: control/backend
+            context: .
             target: development
             args: NODE_ENV=development
 
