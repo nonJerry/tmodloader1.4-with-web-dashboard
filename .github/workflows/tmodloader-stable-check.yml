@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   check-tmodloader-version:
+    name: Check tModLoader Version
     runs-on: ubuntu-latest
     outputs:
       SHOULD_UPDATE: ${{ steps.compareVersions.outputs.SHOULD_UPDATE }}
@@ -34,6 +35,7 @@ jobs:
         run: echo "SHOULD_UPDATE=${{ steps.getCurrentVersion.outputs.CURRENT_VERSION != steps.getRepoVersion.outputs.REPO_VERSION }}" >> $GITHUB_OUTPUT
 
   build:
+    name: Build Docker Images
     if: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE == 'true' }}
     needs: check-tmodloader-version
     uses: ./.github/workflows/build.yml
@@ -43,6 +45,7 @@ jobs:
       CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
 
   tests:
+    name: Run Tests
     needs:
       - check-tmodloader-version
       - build
@@ -54,6 +57,7 @@ jobs:
       CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
 
   update-dockerfile:
+    name: Update Dockerfile in Docker Registry
     if: ${{ needs.check-tmodloader-version.outputs.SHOULD_UPDATE == 'true' }}
     needs:
       - check-tmodloader-version

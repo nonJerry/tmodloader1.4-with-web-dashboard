@@ -1,4 +1,4 @@
-name: "Test"
+name: "Run Tests"
 
 on:
   workflow_call:
@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   unit:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
     env:
       SHOULD_UPDATE: ${{ inputs.SHOULD_UPDATE }}
@@ -50,6 +51,7 @@ jobs:
         run: pnpm run test
 
   e2e:
+    name: Run E2E Tests
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
