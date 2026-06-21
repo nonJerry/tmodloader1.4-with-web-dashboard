@@ -23,7 +23,6 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     env:
-      PUPPETEER_SKIP_DOWNLOAD: "true"
       SHOULD_UPDATE: ${{ inputs.SHOULD_UPDATE }}
       REPO_VERSION: ${{ inputs.REPO_VERSION }}
       CURRENT_VERSION: ${{ inputs.CURRENT_VERSION }}
@@ -111,7 +110,6 @@ jobs:
 
       - name: Create empty config files
         run: touch .env dev/.env control/frontend/.env control/backend/.env control/redis/redis.env control/redis/redis.conf
-
 
       - name: Run e2e tests
         run: pnpm test:e2e

@@ -32,7 +32,7 @@ services:
     build:
       dockerfile: control/frontend/Dockerfile
       context: ..
-      target: development
+      target: production
       cache_from:
         - type=gha
       cache_to:
@@ -49,10 +49,7 @@ services:
       CHOKIDAR_USEPOLLING: true
       CHOKIDAR_INTERVAL: 100
     ports:
-      - 5173:5173
-    volumes:
-      - ../control/frontend:/app/control/frontend:Z,ro
-      - /app/control/frontend/node_modules
+      - 5173:8080
     env_file:
       - ../control/frontend/.env
 
@@ -82,8 +79,8 @@ services:
     secrets:
       - users
     volumes:
-      - ../control/backend/src:/code/control/backend/src:Z,ro
-      - /code/node_modules
+      - ../control/backend/src:/app/control/backend/src:Z,ro
+      - /app/node_modules
 
   redis:
     image: redis:alpine
