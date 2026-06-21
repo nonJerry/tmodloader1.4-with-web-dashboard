@@ -17,7 +17,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm --filter @terraria-podman
 FROM dependencies AS build-prod
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm --filter @terraria-podman/control-backend build && \
   pnpm --filter @terraria-podman/control-backend deploy --prod /app && \
-  mv /app/dist/src/ /app/src/ && rm -rf /app/dist
+  rm -rf /app/src/ && mv /app/dist/src/ /app/src/ && rm -rf /app/dist
 
 FROM base AS development
 WORKDIR /app
