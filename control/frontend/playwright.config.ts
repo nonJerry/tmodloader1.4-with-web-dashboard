@@ -54,6 +54,7 @@ export default defineConfig({
     url: 'http://localhost:5173',
     cwd: '../../',
     reuseExistingServer:true,
-    timeout: 120 * 1000,
+    wait: { stdout: /Listening on port 7777/ },
+    timeout: 180 * 1000,
   },
 })
