@@ -22,9 +22,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm --filter @terraria-podman
 FROM base AS development
 WORKDIR /app
 ARG NODE_ENV=development
-ENV NODE_ENV $NODE_ENV
+ENV NODE_ENV=$NODE_ENV
 ARG PORT=80
-ENV PORT $PORT
+ENV PORT=$PORT
 COPY --from=build-dev /app /app
 ENTRYPOINT ["pnpx", "tsx", "watch", "src/index.ts"]
 EXPOSE $PORT 9229 9230
