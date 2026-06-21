@@ -4,6 +4,7 @@
 # Provided for use in tModLoader deployment. 
 
 # UPDATED FOR DOCKER CONTAINER BY JACOBSMILE
+# Updated for new tModLoader versions by nonJerry
 
 #chdir to path of the script and save it
 cd "$(dirname "$0")"
@@ -44,8 +45,6 @@ if [[ "$_uname" == *"_NT"* ]]; then
 	run_script ./Remove13_64Bit.sh  2>&1 | tee -a "$LogFile"
 fi
 
-. ./UnixLinkerFix.sh
-
 #Parse version from runtimeconfig, jq would be a better solution here, but its not installed by default on all distros.
 echo "Parsing .NET version requirements from runtimeconfig.json"  2>&1 | tee -a "$LogFile"
 dotnet_version=$(sed -n 's/^.*"version": "\(.*\)"/\1/p' <../tModLoader.runtimeconfig.json) #sed, go die plskthx
@@ -61,4 +60,4 @@ fi
 export install_dir="$dotnet_dir/$dotnet_version"
 echo "Success!"  2>&1 | tee -a "$LogFile"
 
-run_script ./InstallNetFramework.sh  2>&1 | tee -a "$LogFile"
+run_script ./InstallDotNet.sh  2>&1 | tee -a "$LogFile"
