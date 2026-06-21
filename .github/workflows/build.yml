@@ -39,7 +39,7 @@ jobs:
           - name: terraria-frontend
             dockerfile: control/frontend/Dockerfile
             context: .
-            target: development
+            target: production
           - name: terraria-backend
             dockerfile: control/backend/Dockerfile
             context: .
