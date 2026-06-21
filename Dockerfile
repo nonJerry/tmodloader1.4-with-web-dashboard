@@ -89,7 +89,7 @@ COPY autosave.sh .
 COPY prepare-config.sh .
 
 RUN apt-get update && apt-get install -y \
-    curl tmux netcat-openbsd libsdl2-2.0-0 bash busybox locales && \
+    curl tmux netcat-openbsd libsdl2-2.0-0 bash busybox locales procps && \
     locale-gen && \
     chmod +x ./LaunchUtils/DotNetInstall.sh && \
     chmod +x ./LaunchUtils/InstallDotNet.sh && \
