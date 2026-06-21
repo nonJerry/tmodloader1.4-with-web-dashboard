@@ -51,10 +51,9 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: process.env.CI ? 'pnpm full-stack-no-build:docker' : 'pnpm dev',
-    url: 'http://localhost:5173',
     cwd: '../../',
-    reuseExistingServer:true,
-    wait: { stdout: /Listening on port 7777/ },
+    reuseExistingServer: true,
+    wait: { stdout: /Listening on port 7777|: No players connected/ },
     timeout: 180 * 1000,
   },
 })
