@@ -17,7 +17,7 @@ services:
       retries: 3
       x-podman.on_failure: restart
     ports:
-      - '6002:6002'
+      - '6002:7777'
     expose:
       - 6002
     volumes:
