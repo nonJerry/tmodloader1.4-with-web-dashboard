@@ -103,7 +103,6 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /data /data
-ARG TMOD_VERSION=v2026.04.3.0
 
 EXPOSE 7777
 ENTRYPOINT ["./entrypoint.sh"]
