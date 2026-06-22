@@ -4,8 +4,9 @@ const helmetConfig = expressHelmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", ],
+      scriptSrc: ["'self'"],
       styleSrc: ["'self'"],
+      frameAncestors: ["'self'"]
     },
   },
 })
