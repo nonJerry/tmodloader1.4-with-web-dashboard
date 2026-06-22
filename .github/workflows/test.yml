@@ -8,16 +8,18 @@ on:
         type: string
         description: "Whether to update the tModLoader version"
       REPO_VERSION:
-        required: true
+        required: false
+        default: ""
         type: string
         description: "The latest tModLoader version"
       CURRENT_VERSION:
-        required: true
+        required: false
+        default: ""
         type: string
         description: "The currently used tModLoader version"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   unit:
