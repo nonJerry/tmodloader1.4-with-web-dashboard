@@ -40,7 +40,7 @@ services:
     image: nonjerry/terraria-frontend:ci
     restart: unless-stopped
     healthcheck:
-      test: "wget --quiet --tries=1 --spider http://127.0.0.1:5173 || exit 1"
+      test: "wget --quiet --tries=1 --spider http://127.0.0.1:8080 || exit 1"
       interval: 30s
       timeout: 5s
       start_period: 10s
