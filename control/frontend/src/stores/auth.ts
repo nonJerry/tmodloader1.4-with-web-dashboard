@@ -22,9 +22,10 @@ export const useAuthStore = defineStore('auth', {
     async initAuth() {
       await web.get('users/me').then(() => {
         this.updateState({ isLoggedIn: true })
-        this.initializeCsrfToken()
       }).catch(() => {
         // Not logged in
+      }).finally(() => {
+        this.initializeCsrfToken()
       })
     },
 
