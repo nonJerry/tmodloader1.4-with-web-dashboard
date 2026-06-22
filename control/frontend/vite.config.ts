@@ -20,7 +20,7 @@ export default defineConfig({
   server: {
     headers: {
       "X-Content-Type-Options": "nosniff",
-      "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors 'self'; img-src 'self'; form-action 'self';"
+      "Content-Security-Policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; frame-ancestors 'self'; form-action 'self' http://localhost:8000; connect-src 'self' http://localhost:8000"
     }
   }
 })
