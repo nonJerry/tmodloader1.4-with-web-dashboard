@@ -1,10 +1,10 @@
 
 import express from 'express'
 import rateLimit from "express-rate-limit";
-import helmet from "helmet"
 import cookieParser from "cookie-parser"
 import { config, IS_PRODUCTION } from './config/constants.js'
 import { doubleCsrfProtection, generateCsrfToken } from "./config/csrf.js"
+import helmetConfig from "./config/helmet.js"
 import corsConfig from "./config/cors.js"
 import errorHandler from "./middleware/error-handler.js"
 import commandsRouter from './api/routes/commands.routes.js'
@@ -24,7 +24,7 @@ const limiter = rateLimit({
 });
 
 app.use(limiter)
-app.use(helmet())
+app.use(helmetConfig)
 app.use(corsConfig)
 app.use(cookieParser(config.sessionSecret))
 app.use(express.json())
