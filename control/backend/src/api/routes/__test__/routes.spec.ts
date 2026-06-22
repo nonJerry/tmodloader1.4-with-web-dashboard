@@ -30,13 +30,13 @@ describe('Auth routes', () => {
     expect(res.status).not.toBe(404)
   })
 
-  it('do not require csrf token', async () => {
+  it('do require csrf token', async () => {
     const res = await request(app)
       .post('/login')
       .send({ username: 'invalid', password: 'invalid' })
       .set('Accept', 'application/json')
 
-    expect(res.status).not.toBe(403)
+    expect(res.status).toBe(403)
   })
 })
 
