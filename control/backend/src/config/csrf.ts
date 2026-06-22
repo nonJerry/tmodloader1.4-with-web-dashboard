@@ -8,14 +8,14 @@ export const { doubleCsrfProtection, invalidCsrfTokenError, generateCsrfToken } 
   getSessionIdentifier: (req) => {
     const token = req.cookies?.accessToken
 
-    if (!token) return ""
+    if (!token) return req.session.id
 
     try {
       const payload = verifyToken(token)
 
       return payload.sessionId ?? payload.username
     } catch {
-      return ""
+      return req.session.id
     }
   },
   cookieOptions: {

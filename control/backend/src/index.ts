@@ -45,7 +45,6 @@ app.get("/csrf-token", (req, res) => {
 })
 
 
-app.use('/', authRouter)
 
 if (!IS_PRODUCTION) {
   console.log('!!!USING TEST ROUTES!!!')
@@ -53,6 +52,7 @@ if (!IS_PRODUCTION) {
 }
 
 app.use(doubleCsrfProtection)
+app.use('/', authRouter)
 app.use('/api', statusRouter)
 app.use('/api', commandsRouter)
 app.use('/users', userRouter)
