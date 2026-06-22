@@ -40,6 +40,7 @@ services:
       - 6001:8080
     env_file:
       - ./control/frontend/.env
+    volumes:
       - ./control/frontend/.nginx.conf:/etc/nginx/conf.d/web.conf:Z,ro # Custom Nginx configuration, e.g. domain for CSP
 
   backend:
