@@ -1,6 +1,7 @@
 import expressHelmet from "helmet"
 
 const helmetConfig = expressHelmet({
+  noSniff: true,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
