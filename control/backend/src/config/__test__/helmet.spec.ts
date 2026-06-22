@@ -23,14 +23,26 @@ describe('Helmet config', () => {
 
     const helmetConfig = (await import('../helmet.js')).default
     expect(typeof helmetConfig).toBe('function')
-    expect(captured.options).toEqual({
+    expect(captured.options).toMatchObject({
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'",],
           styleSrc: ["'self'"],
+          frameAncestors: ["'self'"]
         },
       },
+    })
+  })
+
+  it('uses option against MIME-sniffing', async () => {
+    const captured: { options?: Record<string, unknown> } = {}
+    await captureHelmet(captured)
+
+    const helmetConfig = (await import('../helmet.js')).default
+    expect(typeof helmetConfig).toBe('function')
+    expect(captured.options).toMatchObject({
+      noSniff: true
     })
   })
 })
