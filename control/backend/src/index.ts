@@ -1,5 +1,6 @@
 
 import express from 'express'
+import rateLimit from "express-rate-limit";
 import helmet from "helmet"
 import cookieParser from "cookie-parser"
 import { config, IS_PRODUCTION } from './config/constants.js'
@@ -18,8 +19,11 @@ import testRouter from './api/routes/test.routes.js'
 console.log(`Running in production: ${IS_PRODUCTION}`)
 export const app = express()
 
+const limiter = rateLimit({
+  limit: IS_PRODUCTION ? 100 : 1000
+});
 
-
+app.use(limiter)
 app.use(helmet())
 app.use(corsConfig)
 app.use(cookieParser(config.sessionSecret))
