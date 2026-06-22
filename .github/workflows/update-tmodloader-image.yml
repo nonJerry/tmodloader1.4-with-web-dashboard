@@ -1,4 +1,4 @@
-name: "Update Dockerfile in Docker Registry"
+name: "Update"
 
 on:
   workflow_call:
@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   update-tmodloader-image:
-    name: Update Docker Image in Docker Registry
+    name: Dockerfile in Docker Registry
     runs-on: ubuntu-latest
     env:
       SHOULD_UPDATE: ${{ inputs.SHOULD_UPDATE }}

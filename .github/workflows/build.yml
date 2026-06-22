@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Docker Images
+    name: Docker Images
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
@@ -90,7 +90,7 @@ jobs:
           path: ${{ matrix.image.name }}-image.tar
 
   lint:
-    name: Lint Repository
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:

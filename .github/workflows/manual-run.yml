@@ -31,7 +31,7 @@ jobs:
         run: echo "SHOULD_UPDATE=${{ steps.getCurrentVersion.outputs.CURRENT_VERSION != steps.getRepoVersion.outputs.REPO_VERSION }}" >> $GITHUB_OUTPUT
 
   build:
-    name: Build Docker Images
+    name: Build
     needs: check-tmodloader-version
     uses: ./.github/workflows/build.yml
     with:
@@ -40,7 +40,7 @@ jobs:
       CURRENT_VERSION: ${{needs.check-tmodloader-version.outputs.CURRENT_VERSION}}
 
   tests:
-    name: Run Tests
+    name: Tests
     needs: 
       - check-tmodloader-version
       - build
