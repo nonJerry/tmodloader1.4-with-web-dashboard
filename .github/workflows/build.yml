@@ -8,20 +8,23 @@ on:
         type: string
         description: "Whether to update the tModLoader version"
       REPO_VERSION:
-        required: true
+        required: false
+        default: ""
         type: string
         description: "The latest tModLoader version"
       CURRENT_VERSION:
-        required: true
+        required: false
+        default: ""
         type: string
         description: "The currently used tModLoader version"
 
 permissions:
-  contents: write
+  contents: read
   packages: write
 
 jobs:
   build:
+    name: Build Docker Images
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
@@ -55,6 +58,7 @@ jobs:
         run: sed -i "s/${{ env.CURRENT_VERSION }}/${{ env.REPO_VERSION }}/" ./Dockerfile
 
       - name: Login to GHCR
+        if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork }}
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
@@ -76,7 +80,7 @@ jobs:
             type=registry,ref=ghcr.io/nonjerry/${{ matrix.image.name }}:buildcache
           cache-to: |
             type=gha,mode=max,scope=${{ matrix.image.name }}
-            type=registry,mode=max,ref=ghcr.io/nonjerry/${{ matrix.image.name }}:buildcache
+            ${{ github.event_name != 'pull_request' || !github.event.pull_request.head.repo.fork && format('type=registry,mode=max,ref=ghcr.io/nonjerry/{0}:buildcache', matrix.image.name) || '' }}
 
       - run: docker save nonjerry/${{ matrix.image.name }}:ci -o ${{ matrix.image.name }}-image.tar
 
@@ -86,6 +90,7 @@ jobs:
           path: ${{ matrix.image.name }}-image.tar
 
   lint:
+    name: Lint Repository
     runs-on: ubuntu-latest
 
     steps:
