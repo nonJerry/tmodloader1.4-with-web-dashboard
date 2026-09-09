@@ -27,12 +27,12 @@
   "dependencies": {
     "axios": "^1.20.0",
     "pinia": "^4.0.3",
-    "sass": "^1.103.1",
+    "sass": "^1.104.0",
     "vue": "^3.5.42",
-    "vue-router": "^5.3.0"
+    "vue-router": "^5.3.1"
   },
   "optionalDependencies": {
-    "@rolldown/binding-linux-x64-musl": "^1.2.6",
+    "@rolldown/binding-linux-x64-musl": "^1.2.7",
     "lightningcss-linux-x64-musl": "^1.33.0"
   },
   "devDependencies": {
