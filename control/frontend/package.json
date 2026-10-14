@@ -36,11 +36,11 @@
     "lightningcss-linux-x64-musl": "^1.33.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@tsconfig/node24": "^24.0.5",
     "@types/jsdom": "^30.0.0",
-    "@types/node": "^26.6.4",
-    "@vitejs/plugin-vue": "^6.0.9",
+    "@types/node": "^26.6.5",
+    "@vitejs/plugin-vue": "^6.0.10",
     "@vitejs/plugin-vue-jsx": "^5.1.6",
     "@vitest/eslint-plugin": "^1.6.27",
     "@vue/eslint-config-typescript": "^14.9.0",
@@ -48,7 +48,7 @@
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-oxlint": "~1.86.0",
+    "eslint-plugin-oxlint": "~1.87.0",
     "eslint-plugin-playwright": "^2.12.1",
     "eslint-plugin-vue": "~10.11.1",
     "jiti": "^2.6.1",
@@ -59,8 +59,8 @@
     "typescript": "^6.0.3",
     "vite": "^8.3.1",
     "vite-plugin-vue-devtools": "^8.2.1",
-    "vitest": "^5.0.3",
-    "vue-tsc": "^3.3.12"
+    "vitest": "^5.0.4",
+    "vue-tsc": "^3.3.13"
   },
   "overrides": {
     "glob": "^13.0.6"
