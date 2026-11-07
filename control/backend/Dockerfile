@@ -1,7 +1,8 @@
 FROM node:lts-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME/bin:$PATH"
-RUN corepack enable
+RUN npm install -g pnpm@11.8.0
+ENV PNPM_PACKAGE_IMPORT_METHOD=copy
 RUN pnpm --version
 
 FROM base AS dependencies
