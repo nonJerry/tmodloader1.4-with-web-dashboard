@@ -2,7 +2,7 @@ FROM node:lts-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME/bin:$PATH"
 RUN npm install -g pnpm@11.8.0
-ENV PNPM_PACKAGE_IMPORT_METHOD=copy
+RUN pnpm config set package-import-method copy --global
 RUN pnpm --version
 
 
